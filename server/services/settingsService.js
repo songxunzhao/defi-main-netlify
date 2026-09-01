@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { getBlobStore } = require('../storage/blobs');
+const { getBlobStore, blobsEnabled, skipFsWrites } = require('../storage/blobs');
 
 const SETTINGS_FILE = path.join(__dirname, '..', 'mock', 'settings.json');
 const BLOB_STORE = 'server-settings';
@@ -62,19 +62,20 @@ async function save(settings) {
   memorySettings = { ...settings };
   const store = await getBlobStore(BLOB_STORE);
   if (store) {
-    try {
-      await store.set('settings', JSON.stringify(settings));
-      return;
-    } catch (err) {
-      console.error('Failed to write settings to Netlify Blobs:', err.message);
-      return;
-    }
+    await store.set('settings', JSON.stringify(settings));
+    return;
+  }
+  if (blobsEnabled() && skipFsWrites()) {
+    throw new Error(
+      'Could not save the IP allowlist on Netlify. Confirm Netlify Blobs is enabled for this site, or set ALLOWED_LOGIN_IPS in Site configuration → Environment variables.'
+    );
   }
   try {
     fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
     fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf8');
   } catch (err) {
     console.error('Failed to write settings file:', err);
+    throw new Error('Failed to write settings file.');
   }
 }
 
@@ -87,14 +88,30 @@ function normalizeIp(ip) {
   return value;
 }
 
+function headerValue(req, names) {
+  const headers = (req && req.headers) || {};
+  for (const name of names) {
+    const raw = headers[name] || headers[String(name).toLowerCase()];
+    if (raw == null || raw === '') continue;
+    return String(Array.isArray(raw) ? raw[0] : raw).trim();
+  }
+  return '';
+}
+
 function getClientIp(req) {
   if (!req) return '';
-  const forwarded = req.headers && req.headers['x-forwarded-for'];
-  if (forwarded) {
-    const first = String(forwarded).split(',')[0].trim();
-    if (first) return normalizeIp(first);
+  const forwarded = headerValue(req, ['x-forwarded-for']);
+  const candidates = [
+    headerValue(req, ['x-nf-client-connection-ip', 'client-ip', 'true-client-ip', 'cf-connecting-ip']),
+    ...(forwarded ? forwarded.split(',').map((part) => part.trim()) : []),
+    req.ip,
+    req.socket && req.socket.remoteAddress,
+  ];
+  for (const raw of candidates) {
+    const ip = normalizeIp(raw);
+    if (ip) return ip;
   }
-  return normalizeIp((req.ip) || (req.socket && req.socket.remoteAddress) || '');
+  return '';
 }
 
 function envAllowedIps() {
@@ -162,4 +179,21 @@ async function setAllowedIps(ips, req) {
   return getSettings(req);
 }
 
-module.exports = { getSettings, setServerFlag, setAllowedIps, isRequestIpAllowed, getClientIp };
+async function allowCurrentIp(req) {
+  const current = getClientIp(req);
+  if (!current) {
+    throw Object.assign(new Error('Could not determine the client IP address.'), { status: 400 });
+  }
+  const s = await load();
+  const next = [...storedIps(s), current];
+  return setAllowedIps(next, req);
+}
+
+module.exports = {
+  getSettings,
+  setServerFlag,
+  setAllowedIps,
+  allowCurrentIp,
+  isRequestIpAllowed,
+  getClientIp,
+};

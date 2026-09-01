@@ -10,7 +10,8 @@
   VITE_ENABLE_TESTNETS = "true"
 
 [functions]
-  node_bundler = "nft"
+  node_bundler = "esbuild"
+  external_node_modules = ["@netlify/blobs"]
   included_files = ["server/assets/**"]
 
 [functions.api]

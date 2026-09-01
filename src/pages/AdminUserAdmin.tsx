@@ -62,7 +62,7 @@ export default function AdminUserAdmin() {
       setSettings(s);
       setSaved(true);
     } catch (err) {
-      setError('Failed to update allowed IPs.');
+      setError(err instanceof Error ? err.message : 'Failed to update allowed IPs.');
     } finally {
       setSaving(false);
     }
@@ -75,10 +75,23 @@ export default function AdminUserAdmin() {
     updateIps(next);
   };
 
-  const allowCurrentIp = () => {
-    if (!settings || !settings.currentIp) return;
-    if (settings.ipAllowed) return;
-    updateIps([...settings.allowedAdminIps, settings.currentIp]);
+  const allowCurrentIp = async () => {
+    if (!settings || saving) return;
+    setSaving(true);
+    setError('');
+    setSaved(false);
+    try {
+      const s = await apiFetch<ServerSettings>('/api/settings/allow-current-ip', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      setSettings(s);
+      setSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to allow this IP.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const removeIp = (ip: string) => {
@@ -193,7 +206,7 @@ export default function AdminUserAdmin() {
                       <span className={`w-2 h-2 rounded-full ${settings.ipAllowed ? 'bg-emerald-400' : 'bg-red-400'}`} />
                       {settings.ipAllowed ? 'Allowed to sign in' : 'Not allowed to sign in'}
                     </span>
-                    {!settings.ipAllowed && settings.currentIp && (
+                    {!settings.ipAllowed && (
                       <Button onClick={allowCurrentIp} disabled={saving} size="sm" icon={<PlusIcon size={14} />}>
                         Allow this IP
                       </Button>

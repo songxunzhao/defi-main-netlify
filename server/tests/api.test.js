@@ -86,6 +86,34 @@ test('allows login from an IP listed in ALLOWED_LOGIN_IPS', async () => {
   }
 });
 
+test('allow-current-ip adds the request IP and then login succeeds', async () => {
+  const probe = '198.51.100.99';
+  try {
+    const added = await request('/api/settings/allow-current-ip', {
+      method: 'POST',
+      body: {},
+      forwardedFor: probe,
+    });
+    assert.equal(added.status, 200);
+    assert.equal(added.data.currentIp, probe);
+    assert.equal(added.data.ipAllowed, true);
+    assert.ok(added.data.allowedAdminIps.includes(probe));
+
+    const { status, data } = await request('/api/auth/login', {
+      method: 'POST',
+      body: { email: 'test1@gmail.com', password: 'pass1234' },
+      forwardedFor: probe,
+    });
+    assert.equal(status, 200);
+    assert.ok(data.token);
+  } finally {
+    await request('/api/settings/allowed-ips', {
+      method: 'POST',
+      body: { allowedAdminIps: ['127.0.0.1', '::1', '::ffff:127.0.0.1'] },
+    });
+  }
+});
+
 test('properties require a bearer token', async () => {
   const { status } = await request('/api/properties');
   assert.equal(status, 401);

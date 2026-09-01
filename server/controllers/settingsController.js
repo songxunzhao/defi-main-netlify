@@ -35,7 +35,17 @@ async function setAllowedIps(req, res) {
     res.json(out);
   } catch (err) {
     console.error('setAllowedIps error:', err);
-    res.status(500).json({ error: 'Failed to update allowed IPs' });
+    res.status(err.status || 500).json({ error: err.message || 'Failed to update allowed IPs' });
+  }
+}
+
+async function allowCurrentIp(req, res) {
+  try {
+    const out = await settingsService.allowCurrentIp(req);
+    res.json(out);
+  } catch (err) {
+    console.error('allowCurrentIp error:', err);
+    res.status(err.status || 500).json({ error: err.message || 'Failed to allow this IP' });
   }
 }
 
@@ -63,4 +73,4 @@ async function verifyAdmin(req, res) {
   }
 }
 
-module.exports = { getSettings, setFlag, setAllowedIps, verifyAdmin };
+module.exports = { getSettings, setFlag, setAllowedIps, allowCurrentIp, verifyAdmin };
