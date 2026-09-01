@@ -2,6 +2,12 @@ const serverless = require('serverless-http');
 
 // Hosted demo defaults. Override in the Netlify UI for a real chain deploy.
 if (!process.env.DEMO_MODE) process.env.DEMO_MODE = 'true';
+// NETLIFY is a build-time variable and is often missing in the Functions
+// runtime. Set it before requiring the app so Blobs/IP persistence is used
+// instead of writing settings.json on the read-only Lambda filesystem.
+if (process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT) {
+  process.env.NETLIFY = process.env.NETLIFY || 'true';
+}
 
 const { attachLambdaEvent } = require('../../server/storage/blobs');
 const persistence = require('../../server/mock/persistence');

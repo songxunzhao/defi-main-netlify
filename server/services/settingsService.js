@@ -65,7 +65,7 @@ async function save(settings) {
     await store.set('settings', JSON.stringify(settings));
     return;
   }
-  if (blobsEnabled() && skipFsWrites()) {
+  if (skipFsWrites()) {
     throw new Error(
       'Could not save the IP allowlist on Netlify. Confirm Netlify Blobs is enabled for this site, or set ALLOWED_LOGIN_IPS in Site configuration → Environment variables.'
     );
