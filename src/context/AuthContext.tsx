@@ -1,11 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  apiFetch,
   AuthUser,
   clearToken,
   fetchMe,
   getToken,
-  ServerSettings,
   setToken,
 } from '../utils/api';
 
@@ -16,9 +14,6 @@ type AuthContextType = {
   applySession: (token: string, user: AuthUser) => void;
   refreshUser: () => Promise<void>;
   logout: () => void;
-  serverFlag: boolean;
-  serverFlagLoaded: boolean;
-  setServerFlag: (v: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,25 +21,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [serverFlag, setServerFlagState] = useState(false);
-  const [serverFlagLoaded, setServerFlagLoaded] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    apiFetch<ServerSettings>('/api/settings')
-      .then((s) => {
-        if (active) setServerFlagState(s.serverFlag);
-      })
-      .catch(() => {
-        // If settings can't be reached, assume open mode.
-      })
-      .finally(() => {
-        if (active) setServerFlagLoaded(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -84,11 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
-  const setServerFlag = useCallback((v: boolean) => {
-    setServerFlagState(v);
-    setServerFlagLoaded(true);
-  }, []);
-
   const value = useMemo(
     () => ({
       isLoggedIn: Boolean(user),
@@ -97,11 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       applySession,
       refreshUser,
       logout,
-      serverFlag,
-      serverFlagLoaded,
-      setServerFlag,
     }),
-    [user, authReady, serverFlag, serverFlagLoaded, applySession, refreshUser, logout, setServerFlag]
+    [user, authReady, applySession, refreshUser, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

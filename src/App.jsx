@@ -31,33 +31,20 @@ function WalletLoading() {
 
 function AppRoutes() {
   const { status } = useAccount();
-  const { isLoggedIn, authReady, serverFlag, serverFlagLoaded } = useAuth();
+  const { isLoggedIn, authReady } = useAuth();
   const location = useLocation();
 
   if (status === 'reconnecting' || status === 'connecting') {
     return <WalletLoading />;
   }
 
-  // if (!isConnected) {
-  //   return <ConnectLanding />;
-  // }
-
-  // Always-reachable routes: the login page and the server settings page.
   const publicPaths = ['/', '/adminuseradmin_useradminuser'];
   const isPublic = publicPaths.includes(location.pathname);
 
-  // Wait for the server's restricted-mode flag before showing protected pages,
-  // so a direct URL visit (e.g. typing /home) doesn't flash app content.
-  if (!isPublic && (!serverFlagLoaded || !authReady)) {
+  if (!isPublic && !authReady) {
     return <WalletLoading />;
   }
 
-  // Restricted mode: even logged-in users are sent back to the login page.
-  if (!isPublic && serverFlag) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Everything else requires a successful sign-in first.
   if (!isPublic && !isLoggedIn) {
     return <Navigate to="/" replace />;
   }

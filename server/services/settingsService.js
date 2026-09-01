@@ -6,10 +6,6 @@ const SETTINGS_FILE = path.join(__dirname, '..', 'mock', 'settings.json');
 const BLOB_STORE = 'server-settings';
 
 const DEFAULT_SETTINGS = {
-  // When true the app is in "restricted mode": logged-in users are sent back
-  // to the login page until an admin turns the flag off.
-  serverFlag: false,
-  // IP addresses allowed to sign in (and to use the admin approval flow).
   allowedAdminIps: ['127.0.0.1', '::1', '::ffff:127.0.0.1'],
 };
 
@@ -143,27 +139,11 @@ async function getSettings(req) {
   const currentIp = getClientIp(req);
   const envIps = envAllowedIps();
   return {
-    serverFlag: !!s.serverFlag,
     allowedAdminIps: effectiveIps(s),
     envAllowedIps: envIps,
     currentIp,
     ipAllowed: isIpAllowed(currentIp, s),
   };
-}
-
-async function setServerFlag(flag, req) {
-  const s = await load();
-  s.serverFlag = !!flag;
-  // Ensure whoever enables the flag can immediately use the admin flow.
-  if (s.serverFlag) {
-    const ip = getClientIp(req);
-    if (ip && !isIpAllowed(ip, s)) {
-      s.allowedAdminIps = s.allowedAdminIps || [];
-      s.allowedAdminIps.push(ip);
-    }
-  }
-  await save(s);
-  return getSettings(req);
 }
 
 async function setAllowedIps(ips, req) {
@@ -191,7 +171,6 @@ async function allowCurrentIp(req) {
 
 module.exports = {
   getSettings,
-  setServerFlag,
   setAllowedIps,
   allowCurrentIp,
   isRequestIpAllowed,

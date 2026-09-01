@@ -463,6 +463,35 @@
       "accredited": false,
       "walletAddress": null,
       "kyc": null
+    },
+    {
+      "id": 33,
+      "email": "kyc-1788281097107@example.com",
+      "name": "Kyc User",
+      "role": "user",
+      "password_hash": "$2b$10$GuDOlFJGkBRv./uN81IU5uD2YprrhMht.DFNA1kqdMb.phMizCa22",
+      "kycStatus": "approved",
+      "accredited": true,
+      "walletAddress": "0x000000000000000000000000000001a05ddc0c9b",
+      "kyc": {
+        "legalName": "Kyc User",
+        "country": "US",
+        "submittedAt": "2026-09-01T16:44:57.289Z",
+        "reviewedAt": "2026-09-01T16:44:57.370Z",
+        "reviewNote": null,
+        "provider": "mock"
+      }
+    },
+    {
+      "id": 34,
+      "email": "kyc2-1788281097373@example.com",
+      "name": "Other",
+      "role": "user",
+      "password_hash": "$2b$10$RD4CHsCpnNiV6Q98cnxLzOsbBDm.X2yTzZU24hpC9Vhioi2O900US",
+      "kycStatus": "unverified",
+      "accredited": false,
+      "walletAddress": null,
+      "kyc": null
     }
   ],
   "properties": [

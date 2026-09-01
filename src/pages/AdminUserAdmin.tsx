@@ -31,25 +31,6 @@ export default function AdminUserAdmin() {
     load();
   }, []);
 
-  const toggleFlag = async () => {
-    if (!settings || saving) return;
-    setSaving(true);
-    setError('');
-    setSaved(false);
-    try {
-      const s = await apiFetch<ServerSettings>('/api/settings/flag', {
-        method: 'POST',
-        body: JSON.stringify({ serverFlag: !settings.serverFlag }),
-      });
-      setSettings(s);
-      setSaved(true);
-    } catch (err) {
-      setError('Failed to update the server flag.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const updateIps = async (ips: string[]) => {
     setSaving(true);
     setError('');
@@ -126,7 +107,7 @@ export default function AdminUserAdmin() {
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-cream-100">Server settings</h1>
-              <p className="text-sm text-cream-400">Restricted-mode flag &amp; login IP allowlist</p>
+              <p className="text-sm text-cream-400">Login IP allowlist</p>
             </div>
           </div>
 
@@ -146,46 +127,6 @@ export default function AdminUserAdmin() {
                 <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3">
                   <CheckCircleIcon size={16} className="flex-shrink-0" />
                   Settings saved.
-                </div>
-              )}
-
-              {/* Server flag toggle */}
-              {settings && (
-                <div className="rounded-2xl border border-void-700 bg-void-800/80 p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="font-display text-lg font-semibold text-cream-100 mb-1">
-                        Restricted mode
-                      </h2>
-                      <p className="text-sm text-cream-400 leading-relaxed max-w-md">
-                        When enabled, every sign-in requires an IP-restricted admin
-                        approval before the user can continue to the app.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={toggleFlag}
-                      disabled={saving}
-                      aria-pressed={settings.serverFlag}
-                      className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 flex-shrink-0 ${
-                        settings.serverFlag ? 'bg-accent' : 'bg-void-600'
-                      } disabled:opacity-50`}
-                    >
-                      <span
-                        className={`inline-block h-6 w-6 transform rounded-full bg-cream-100 shadow transition-transform duration-200 ${
-                          settings.serverFlag ? 'translate-x-7' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  <div className="mt-4 inline-flex items-center gap-2 text-sm rounded-full px-3 py-1.5 border ${
-                    settings.serverFlag
-                      ? 'text-accent border-accent/30 bg-accent-muted'
-                      : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
-                  }">
-                    <span className={`w-2 h-2 rounded-full ${settings.serverFlag ? 'bg-accent' : 'bg-emerald-400'}`} />
-                    {settings.serverFlag ? 'Server flag is ON' : 'Server flag is OFF'}
-                  </div>
                 </div>
               )}
 

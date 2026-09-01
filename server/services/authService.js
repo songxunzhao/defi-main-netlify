@@ -45,17 +45,4 @@ async function authenticateUser({ email, password }) {
   return { token, user: sanitizeUser(user) };
 }
 
-// Same as authenticateUser but requires the account to hold the 'admin' role.
-// Used by the IP-restricted admin approval flow.
-async function authenticateAdmin({ email, password }) {
-  const { data } = persistence;
-  const user = data.users.find(u => u.email === email);
-  if (!user || user.role !== 'admin') throw new Error('Invalid admin credentials');
-  const ok = await bcrypt.compare(password, user.password_hash || '');
-  if (!ok) throw new Error('Invalid admin credentials');
-
-  const token = jwt.sign({ sub: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-  return { token, user: sanitizeUser(user) };
-}
-
-module.exports = { registerUser, authenticateUser, authenticateAdmin };
+module.exports = { registerUser, authenticateUser };

@@ -1,5 +1,4 @@
 export type ServerSettings = {
-  serverFlag: boolean;
   allowedAdminIps: string[];
   envAllowedIps?: string[];
   currentIp: string;

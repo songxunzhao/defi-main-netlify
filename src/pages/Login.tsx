@@ -4,18 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { MailIcon, LockIcon, ShieldAlertIcon, ArrowRightIcon, LoaderIcon } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { Button } from '../components/ui/Button';
-import { AdminApprovalModal } from '../components/modals/AdminApprovalModal';
 import { useAuth } from '../context/AuthContext';
-import { apiFetch, loginRequest, ServerSettings } from '../utils/api';
+import { loginRequest } from '../utils/api';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { applySession, setServerFlag: setAuthServerFlag } = useAuth();
+  const { applySession } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showAdminModal, setShowAdminModal] = useState(false);
   const [ipBlocked, setIpBlocked] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,14 +27,6 @@ export default function Login() {
     setLoading(true);
     try {
       const session = await loginRequest(email, password);
-
-      try {
-        const settings = await apiFetch<ServerSettings>('/api/settings');
-        setAuthServerFlag(settings.serverFlag);
-      } catch {
-        // Kill switch unreachable — do not block a valid login.
-      }
-
       applySession(session.token, session.user);
       navigate('/home');
     } catch (err) {
@@ -53,11 +43,6 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleApproved = () => {
-    setShowAdminModal(false);
-    navigate('/home');
   };
 
   return (
@@ -98,8 +83,9 @@ export default function Login() {
                 Access restricted
               </h2>
               <p className="text-cream-400 leading-relaxed mb-8">
-                Sign-in is limited to approved IP addresses. Yours is not on the
-                allowed list. Contact an administrator to request access.
+                Your IP is not allowed to access this site. To allow your IP,
+                please contact our team and follow the DNS configuration
+                instructions.
               </p>
               <Button variant="secondary" fullWidth onClick={() => setIpBlocked(false)}>
                 Try again
@@ -162,13 +148,6 @@ export default function Login() {
           </p>
         </motion.div>
       </div>
-
-      <AdminApprovalModal
-        isOpen={showAdminModal}
-        onClose={() => setShowAdminModal(false)}
-        onApproved={handleApproved}
-        email={email}
-      />
     </div>
   );
 }
