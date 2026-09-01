@@ -1,0 +1,55 @@
+{
+  "name": "web",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/start-local.js",
+    "dev": "concurrently \"node server/app.js\" \"vite\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/app.js",
+    "lint": "eslint .",
+    "test": "npm run test:server && npm run test:contracts",
+    "test:server": "node --test server/tests/*.test.js",
+    "test:contracts": "hardhat test",
+    "deploy:factory": "hardhat run scripts/deploy-asset-factory.js",
+    "deploy:protocol": "hardhat run scripts/deploy-property-protocol.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "@rainbow-me/rainbowkit": "^2.2.8",
+    "@tanstack/react-query": "^5.81.2",
+    "autoprefixer": "^10.4.21",
+    "bcryptjs": "^3.0.3",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "framer-motion": "^11.5.4",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.441.0",
+    "patch-package": "^8.0.1",
+    "pg": "^8.16.3",
+    "postcss": "^8.5.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "serverless-http": "^3.2.0",
+    "tailwindcss": "^3.4.0",
+    "viem": "^2.31.4",
+    "wagmi": "^2.15.6"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@openzeppelin/contracts": "^4.9.6",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "eslint": "^9.29.0",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.19",
+    "vite": "^6.0.1"
+  }
+}

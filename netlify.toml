@@ -1,0 +1,42 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+  DEMO_MODE = "true"
+  VITE_DEMO_MODE = "true"
+  VITE_ENABLE_TESTNETS = "true"
+
+[functions]
+  node_bundler = "nft"
+  included_files = ["server/assets/**"]
+
+[functions.api]
+  timeout = 26
+
+# Proxy all /api/* requests to the Netlify Function that wraps the Express app.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/api/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ready"
+  to = "/.netlify/functions/api/ready"
+  status = 200
+  force = true
+
+# SPA fallback: let client-side routes (e.g. /home) work on direct navigation.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

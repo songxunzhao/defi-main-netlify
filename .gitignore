@@ -1,0 +1,47 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# vite
+/dist
+
+# hardhat
+/contracts/cache
+/contracts/artifacts
+/cache
+/artifacts
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files (can opt-in for commiting if needed)
+.env*
+!.env.example
+
+# generated document vault (seed PDFs + admin uploads)
+/server/vault
+
+# generated listing uploads
+/server/images
+
+# typescript
+*.tsbuildinfo
+/.githooks
+/.vscode
+
+attach.js
+INTERVIEW.md
+

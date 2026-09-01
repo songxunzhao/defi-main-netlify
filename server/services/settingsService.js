@@ -1,0 +1,145 @@
+const fs = require('fs');
+const path = require('path');
+const { getBlobStore } = require('../storage/blobs');
+
+const SETTINGS_FILE = path.join(__dirname, '..', 'mock', 'settings.json');
+const BLOB_STORE = 'server-settings';
+
+const DEFAULT_SETTINGS = {
+  // When true the app is in "restricted mode": after any login attempt an
+  // IP-restricted admin approval step is required before proceeding.
+  serverFlag: false,
+  // IP addresses allowed to use the admin approval flow (admin modal / verify).
+  allowedAdminIps: ['127.0.0.1', '::1', '::ffff:127.0.0.1'],
+};
+
+// In-memory copy of the last known settings. Used as a fallback so the flag
+// toggle never fails even if the blob store cannot be written (e.g. on Netlify
+// when blobs are not provisioned, or during local `netlify dev` runs).
+let memorySettings = null;
+
+async function load() {
+  const store = await getBlobStore(BLOB_STORE);
+  if (store) {
+    try {
+      const raw = await store.get('settings', { type: 'text' });
+      if (raw) {
+        memorySettings = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+        return { ...memorySettings };
+      }
+    } catch (err) {
+      console.error('Error reading blob settings:', err.message);
+    }
+    // No blob data (or the read failed): use the last in-memory copy.
+    return memorySettings ? { ...memorySettings } : { ...DEFAULT_SETTINGS };
+  }
+
+  // Local development: read/write the JSON file.
+  if (fs.existsSync(SETTINGS_FILE)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'));
+      memorySettings = { ...DEFAULT_SETTINGS, ...parsed };
+      return { ...memorySettings };
+    } catch (err) {
+      console.error('Error reading settings file, falling back to defaults:', err);
+    }
+  }
+  if (memorySettings) return { ...memorySettings };
+  const fresh = { ...DEFAULT_SETTINGS };
+  memorySettings = fresh;
+  try {
+    fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(fresh, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to write initial settings file:', err);
+  }
+  return fresh;
+}
+
+// Never throws: persistence is best-effort and the in-memory copy always
+// reflects the latest change so callers keep working.
+async function save(settings) {
+  memorySettings = { ...settings };
+  const store = await getBlobStore(BLOB_STORE);
+  if (store) {
+    try {
+      await store.set('settings', JSON.stringify(settings));
+      return;
+    } catch (err) {
+      console.error('Failed to write settings to Netlify Blobs:', err.message);
+      return;
+    }
+  }
+  try {
+    fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to write settings file:', err);
+  }
+}
+
+// Normalize IPv4-mapped IPv6 and loopback aliases so matching is consistent.
+function normalizeIp(ip) {
+  if (!ip) return '';
+  let value = String(ip).trim().toLowerCase();
+  if (value.startsWith('::ffff:')) value = value.slice(7);
+  if (value === '::1') value = '127.0.0.1';
+  return value;
+}
+
+function getClientIp(req) {
+  if (!req) return '';
+  const forwarded = req.headers && req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const first = String(forwarded).split(',')[0].trim();
+    if (first) return normalizeIp(first);
+  }
+  return normalizeIp((req.ip) || (req.socket && req.socket.remoteAddress) || '');
+}
+
+function isIpAllowed(ip, settings) {
+  const normalized = normalizeIp(ip);
+  if (!normalized) return false;
+  return (settings.allowedAdminIps || []).some((entry) => normalizeIp(entry) === normalized);
+}
+
+async function isRequestIpAllowed(req) {
+  const s = await load();
+  return isIpAllowed(getClientIp(req), s);
+}
+
+async function getSettings(req) {
+  const s = await load();
+  const currentIp = getClientIp(req);
+  return {
+    serverFlag: !!s.serverFlag,
+    allowedAdminIps: s.allowedAdminIps || [],
+    currentIp,
+    ipAllowed: isIpAllowed(currentIp, s),
+  };
+}
+
+async function setServerFlag(flag, req) {
+  const s = await load();
+  s.serverFlag = !!flag;
+  // Ensure whoever enables the flag can immediately use the admin flow.
+  if (s.serverFlag) {
+    const ip = getClientIp(req);
+    if (ip && !isIpAllowed(ip, s)) {
+      s.allowedAdminIps = s.allowedAdminIps || [];
+      s.allowedAdminIps.push(ip);
+    }
+  }
+  await save(s);
+  return getSettings(req);
+}
+
+async function setAllowedIps(ips, req) {
+  const s = await load();
+  const normalized = [...new Set((ips || []).map(normalizeIp).filter(Boolean))];
+  s.allowedAdminIps = normalized;
+  await save(s);
+  return getSettings(req);
+}
+
+module.exports = { getSettings, setServerFlag, setAllowedIps, isRequestIpAllowed, getClientIp };

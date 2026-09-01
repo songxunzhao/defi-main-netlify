@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-void-950 text-cream-100 font-sans antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-cream-50;
+  }
+
+  a {
+    @apply text-inherit no-underline transition-colors duration-200;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-void-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-void-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-void-400;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-display {
+    font-family: 'Syne', system-ui, sans-serif;
+  }
+}
+
+/* RainbowKit overrides for design system */
+[data-rk] button {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+
+[data-rk] [data-testid="rk-connect-button"] {
+  border-radius: 0.375rem !important;
+  font-weight: 500 !important;
+}
+
+/* Account address lives in nested spans that set their own color. Inherit
+   the button's text color so a dark chrome + light-theme text is never invisible. */
+[data-rk] button,
+[data-rk] [role="button"] {
+  color: #f8f6f0 !important;
+}
+
+[data-rk] button *,
+[data-rk] [role="button"] * {
+  color: inherit !important;
+}
