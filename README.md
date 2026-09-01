@@ -93,8 +93,16 @@ This repo is set up as a Vite static site plus a Netlify Function that wraps the
    - `JWT_SECRET` — long random string
    - `DEMO_MODE=true` and `VITE_DEMO_MODE=true` (already defaulted in `netlify.toml`)
    - `VITE_WALLETCONNECT_PROJECT_ID` — from [WalletConnect Cloud](https://cloud.walletconnect.com) (MetaMask still works without it)
+   - `ALLOWED_LOGIN_IPS` — comma-separated IPs that may sign in (for example `203.0.113.10,198.51.100.22`). Redeploy after changing this so the function picks it up.
 3. For on-chain features, set the `VITE_*` contract addresses, `CHAIN_ID`, and a public `CHAIN_RPC_URL` (for example Sepolia). Do not point RPC at `127.0.0.1`. See `.env.example`.
 4. Redeploy after changing any `VITE_*` variable so the frontend rebuilds.
+
+Login is limited to the allowlist. Configure it in either place:
+
+- **Netlify UI (recommended for deploy):** Site configuration → Environment variables → `ALLOWED_LOGIN_IPS`
+- **In the app:** open `/adminuseradmin_useradminuser` on the live site (no login required), confirm **Your IP address**, and click **Allow this IP**. Extra addresses are stored in Netlify Blobs.
+
+Default allowlist is only loopback (`127.0.0.1`), so a Netlify deploy will reject sign-in until you add your public IP with one of the methods above.
 
 `/api/*`, `/health`, and `/ready` are proxied to the function. Client-side routes such as `/home` fall back to `index.html`.
 

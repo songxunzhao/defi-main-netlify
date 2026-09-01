@@ -18,9 +18,10 @@ after(async () => {
   await new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())));
 });
 
-async function request(path, { method = 'GET', body, token } = {}) {
+async function request(path, { method = 'GET', body, token, forwardedFor } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
+  if (forwardedFor) headers['X-Forwarded-For'] = forwardedFor;
   const res = await fetch(`${base}${path}`, {
     method,
     headers,
@@ -55,6 +56,34 @@ test('issues a JWT for the seed user', async () => {
   assert.equal(status, 200);
   assert.ok(data.token);
   assert.equal(data.user.email, 'test1@gmail.com');
+});
+
+test('rejects login from an IP that is not on the allowlist', async () => {
+  const { status, data } = await request('/api/auth/login', {
+    method: 'POST',
+    body: { email: 'test1@gmail.com', password: 'pass1234' },
+    forwardedFor: '203.0.113.50',
+  });
+  assert.equal(status, 403);
+  assert.match(data.error || '', /not allowed to log in/i);
+  assert.equal(data.token, undefined);
+});
+
+test('allows login from an IP listed in ALLOWED_LOGIN_IPS', async () => {
+  const previous = process.env.ALLOWED_LOGIN_IPS;
+  process.env.ALLOWED_LOGIN_IPS = '203.0.113.50,198.51.100.22';
+  try {
+    const { status, data } = await request('/api/auth/login', {
+      method: 'POST',
+      body: { email: 'test1@gmail.com', password: 'pass1234' },
+      forwardedFor: '203.0.113.50',
+    });
+    assert.equal(status, 200);
+    assert.ok(data.token);
+  } finally {
+    if (previous === undefined) delete process.env.ALLOWED_LOGIN_IPS;
+    else process.env.ALLOWED_LOGIN_IPS = previous;
+  }
 });
 
 test('properties require a bearer token', async () => {

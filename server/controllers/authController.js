@@ -1,11 +1,21 @@
 const authService = require('../services/authService');
 const persistence = require('../mock/persistence');
+const settingsService = require('../services/settingsService');
 const { sanitizeUser } = require('../models/userModel');
+
+const IP_DENIED = 'IP address is not allowed to log in';
+
+async function assertIpAllowed(req, res) {
+  if (await settingsService.isRequestIpAllowed(req)) return true;
+  res.status(403).json({ error: IP_DENIED });
+  return false;
+}
 
 async function register(req, res) {
   try {
     const { email, password, username, role } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+    if (!(await assertIpAllowed(req, res))) return;
     const user = await authService.registerUser({ email, password, username, role });
     return res.status(201).json({ user });
   } catch (err) {
@@ -19,6 +29,7 @@ async function login(req, res) {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+    if (!(await assertIpAllowed(req, res))) return;
     const out = await authService.authenticateUser({ email, password });
     return res.json(out);
   } catch {

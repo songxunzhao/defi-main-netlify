@@ -7,7 +7,6 @@ import { Button } from '../components/ui/Button';
 import { AdminApprovalModal } from '../components/modals/AdminApprovalModal';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch, loginRequest, ServerSettings } from '../utils/api';
-import type { AuthUser } from '../utils/api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,8 +17,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [ipBlocked, setIpBlocked] = useState(false);
-  const [serverFlag, setServerFlag] = useState(false);
-  const [pendingSession, setPendingSession] = useState<{ token: string; user: AuthUser } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,27 +30,20 @@ export default function Login() {
     try {
       const session = await loginRequest(email, password);
 
-      let restricted = false;
       try {
         const settings = await apiFetch<ServerSettings>('/api/settings');
-        setServerFlag(settings.serverFlag);
         setAuthServerFlag(settings.serverFlag);
-        restricted = settings.serverFlag;
       } catch {
         // Kill switch unreachable — do not block a valid login.
       }
 
-      if (!restricted) {
-        applySession(session.token, session.user);
-        navigate('/home');
-        return;
-      }
-
-      setPendingSession(session);
-      setIpBlocked(true);
+      applySession(session.token, session.user);
+      navigate('/home');
     } catch (err) {
       const message = err instanceof Error ? err.message : '';
-      if (message === 'Invalid credentials') {
+      if (/ip address is not allowed/i.test(message)) {
+        setIpBlocked(true);
+      } else if (message === 'Invalid credentials') {
         setError('Invalid email or password.');
       } else if (message) {
         setError(message);
@@ -67,13 +57,6 @@ export default function Login() {
 
   const handleApproved = () => {
     setShowAdminModal(false);
-    if (serverFlag) {
-      navigate('/');
-      return;
-    }
-    if (pendingSession) {
-      applySession(pendingSession.token, pendingSession.user);
-    }
     navigate('/home');
   };
 
@@ -115,9 +98,8 @@ export default function Login() {
                 Access restricted
               </h2>
               <p className="text-cream-400 leading-relaxed mb-8">
-                This server is in restricted mode and your IP address is not
-                authorized for admin approval. Please contact the administrator
-                to request access.
+                Sign-in is limited to approved IP addresses. Yours is not on the
+                allowed list. Contact an administrator to request access.
               </p>
               <Button variant="secondary" fullWidth onClick={() => setIpBlocked(false)}>
                 Try again

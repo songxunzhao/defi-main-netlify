@@ -6,10 +6,10 @@ const SETTINGS_FILE = path.join(__dirname, '..', 'mock', 'settings.json');
 const BLOB_STORE = 'server-settings';
 
 const DEFAULT_SETTINGS = {
-  // When true the app is in "restricted mode": after any login attempt an
-  // IP-restricted admin approval step is required before proceeding.
+  // When true the app is in "restricted mode": logged-in users are sent back
+  // to the login page until an admin turns the flag off.
   serverFlag: false,
-  // IP addresses allowed to use the admin approval flow (admin modal / verify).
+  // IP addresses allowed to sign in (and to use the admin approval flow).
   allowedAdminIps: ['127.0.0.1', '::1', '::ffff:127.0.0.1'],
 };
 
@@ -97,10 +97,23 @@ function getClientIp(req) {
   return normalizeIp((req.ip) || (req.socket && req.socket.remoteAddress) || '');
 }
 
+function envAllowedIps() {
+  const raw = process.env.ALLOWED_LOGIN_IPS || '';
+  return [...new Set(raw.split(/[\s,]+/).map(normalizeIp).filter(Boolean))];
+}
+
+function storedIps(settings) {
+  return [...new Set((settings.allowedAdminIps || []).map(normalizeIp).filter(Boolean))];
+}
+
+function effectiveIps(settings) {
+  return [...new Set([...envAllowedIps(), ...storedIps(settings)])];
+}
+
 function isIpAllowed(ip, settings) {
   const normalized = normalizeIp(ip);
   if (!normalized) return false;
-  return (settings.allowedAdminIps || []).some((entry) => normalizeIp(entry) === normalized);
+  return effectiveIps(settings).includes(normalized);
 }
 
 async function isRequestIpAllowed(req) {
@@ -111,9 +124,11 @@ async function isRequestIpAllowed(req) {
 async function getSettings(req) {
   const s = await load();
   const currentIp = getClientIp(req);
+  const envIps = envAllowedIps();
   return {
     serverFlag: !!s.serverFlag,
-    allowedAdminIps: s.allowedAdminIps || [],
+    allowedAdminIps: effectiveIps(s),
+    envAllowedIps: envIps,
     currentIp,
     ipAllowed: isIpAllowed(currentIp, s),
   };
@@ -136,7 +151,12 @@ async function setServerFlag(flag, req) {
 
 async function setAllowedIps(ips, req) {
   const s = await load();
-  const normalized = [...new Set((ips || []).map(normalizeIp).filter(Boolean))];
+  const fromEnv = new Set(envAllowedIps());
+  // Env IPs stay in ALLOWED_LOGIN_IPS (Netlify / .env). Only extra addresses
+  // from this form are persisted to blobs or the local settings file.
+  const normalized = [...new Set((ips || []).map(normalizeIp).filter(Boolean))].filter(
+    (ip) => !fromEnv.has(ip)
+  );
   s.allowedAdminIps = normalized;
   await save(s);
   return getSettings(req);

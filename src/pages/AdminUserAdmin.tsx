@@ -75,10 +75,19 @@ export default function AdminUserAdmin() {
     updateIps(next);
   };
 
+  const allowCurrentIp = () => {
+    if (!settings || !settings.currentIp) return;
+    if (settings.ipAllowed) return;
+    updateIps([...settings.allowedAdminIps, settings.currentIp]);
+  };
+
   const removeIp = (ip: string) => {
     if (!settings) return;
+    if ((settings.envAllowedIps || []).includes(ip)) return;
     updateIps(settings.allowedAdminIps.filter((entry) => entry !== ip));
   };
+
+  const envIps = new Set(settings?.envAllowedIps || []);
 
   return (
     <div className="min-h-screen bg-void-950 text-cream-100 flex flex-col relative overflow-x-hidden">
@@ -104,7 +113,7 @@ export default function AdminUserAdmin() {
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-cream-100">Server settings</h1>
-              <p className="text-sm text-cream-400">Restricted-mode flag &amp; admin approval IPs</p>
+              <p className="text-sm text-cream-400">Restricted-mode flag &amp; login IP allowlist</p>
             </div>
           </div>
 
@@ -182,9 +191,18 @@ export default function AdminUserAdmin() {
                       settings.ipAllowed ? 'text-emerald-400' : 'text-red-400'
                     }`}>
                       <span className={`w-2 h-2 rounded-full ${settings.ipAllowed ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                      {settings.ipAllowed ? 'Allowed for admin approval' : 'Not allowed'}
+                      {settings.ipAllowed ? 'Allowed to sign in' : 'Not allowed to sign in'}
                     </span>
+                    {!settings.ipAllowed && settings.currentIp && (
+                      <Button onClick={allowCurrentIp} disabled={saving} size="sm" icon={<PlusIcon size={14} />}>
+                        Allow this IP
+                      </Button>
+                    )}
                   </div>
+                  <p className="text-xs text-cream-400/70 mt-3">
+                    On Netlify this is the visitor address from <code className="text-cream-300">X-Forwarded-For</code>.
+                    You can also set <code className="text-cream-300">ALLOWED_LOGIN_IPS</code> in Site configuration → Environment variables.
+                  </p>
                 </div>
               )}
 
@@ -192,10 +210,12 @@ export default function AdminUserAdmin() {
               {settings && (
                 <div className="rounded-2xl border border-void-700 bg-void-800/80 p-6">
                   <h2 className="font-display text-lg font-semibold text-cream-100 mb-1">
-                    Allowed admin IPs
+                    Allowed login IPs
                   </h2>
                   <p className="text-sm text-cream-400 mb-5">
-                    Only requests from these addresses may use the admin approval flow.
+                    Only these addresses may sign in. Add them here, or set{' '}
+                    <code className="text-cream-200">ALLOWED_LOGIN_IPS</code> in Netlify
+                    (comma-separated). Env-var addresses cannot be removed from this page.
                   </p>
 
                   <div className="flex gap-2 mb-5">
@@ -215,20 +235,30 @@ export default function AdminUserAdmin() {
                     <p className="text-sm text-cream-400/60">No allowed IPs configured.</p>
                   ) : (
                     <ul className="space-y-2">
-                      {settings.allowedAdminIps.map((ip) => (
+                      {settings.allowedAdminIps.map((ip) => {
+                        const fromEnv = envIps.has(ip);
+                        return (
                         <li key={ip} className="flex items-center justify-between gap-3 rounded-xl bg-void-700/50 border border-void-600 px-4 py-2.5">
-                          <code className="text-sm text-cream-100">{ip}</code>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <code className="text-sm text-cream-100">{ip}</code>
+                            {fromEnv && (
+                              <span className="text-[10px] uppercase tracking-wide text-accent border border-accent/30 rounded-full px-2 py-0.5">
+                                env
+                              </span>
+                            )}
+                          </div>
                           <button
                             type="button"
                             onClick={() => removeIp(ip)}
-                            disabled={saving}
+                            disabled={saving || fromEnv}
                             className="p-2 rounded-lg text-cream-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-                            aria-label={`Remove ${ip}`}
+                            aria-label={fromEnv ? `${ip} comes from ALLOWED_LOGIN_IPS` : `Remove ${ip}`}
                           >
                             <TrashIcon size={16} />
                           </button>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
