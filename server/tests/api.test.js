@@ -268,6 +268,8 @@ test('admin can create, patch, and delete a property', async () => {
       lat: 30.2672,
       lng: -97.7431,
       unitMix: '1× 2,000 sq ft retail',
+      bedrooms: 2,
+      bathrooms: 1,
       comps: [{ address: '100 Congress Ave, Austin, TX', soldDate: '2026-01-15', priceUsd: 490000, sqft: 1900, note: 'Illustrative' }],
       documents: [{ name: 'PPM', url: 'https://example.com/ppm.pdf' }],
     },
@@ -278,6 +280,8 @@ test('admin can create, patch, and delete a property', async () => {
   assert.equal(created.data.property.grossRentMonthly, 2800);
   assert.equal(created.data.property.lat, 30.2672);
   assert.equal(created.data.property.unitMix, '1× 2,000 sq ft retail');
+  assert.equal(created.data.property.bedrooms, 2);
+  assert.equal(created.data.property.bathrooms, 1);
   assert.equal(created.data.property.comps.length, 1);
   const id = created.data.property.id;
 

@@ -34,6 +34,8 @@ export function ListingCmsModal({ isOpen, property, onClose, onSaved }: ListingC
   const [gallery, setGallery] = useState('');
   const [features, setFeatures] = useState('');
   const [unitMix, setUnitMix] = useState('');
+  const [bedrooms, setBedrooms] = useState('');
+  const [bathrooms, setBathrooms] = useState('');
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
   const [mapUrl, setMapUrl] = useState('');
@@ -51,6 +53,8 @@ export function ListingCmsModal({ isOpen, property, onClose, onSaved }: ListingC
     setGallery((property.galleryUrls || []).join('\n'));
     setFeatures((property.features || []).join(', '));
     setUnitMix(property.unitMix || '');
+    setBedrooms(property.bedrooms == null ? '' : String(property.bedrooms));
+    setBathrooms(property.bathrooms == null ? '' : String(property.bathrooms));
     setLat(property.lat == null ? '' : String(property.lat));
     setLng(property.lng == null ? '' : String(property.lng));
     setMapUrl(property.mapUrl || '');
@@ -106,6 +110,8 @@ export function ListingCmsModal({ isOpen, property, onClose, onSaved }: ListingC
           .map((item) => item.trim())
           .filter(Boolean),
         unitMix,
+        bedrooms: bedrooms === '' ? null : Number(bedrooms),
+        bathrooms: bathrooms === '' ? null : Number(bathrooms),
         lat: lat === '' ? null : Number(lat),
         lng: lng === '' ? null : Number(lng),
         mapUrl,
@@ -203,6 +209,16 @@ export function ListingCmsModal({ isOpen, property, onClose, onSaved }: ListingC
                 <div>
                   <label className="block text-sm font-medium text-cream-400 mb-1.5">Features (comma-separated)</label>
                   <input className={fieldClass} value={features} onChange={(e) => setFeatures(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-1.5">Rooms</label>
+                    <input className={fieldClass} type="number" min={0} step="1" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-1.5">WCs</label>
+                    <input className={fieldClass} type="number" min={0} step="0.5" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-cream-400 mb-1.5">Unit mix</label>

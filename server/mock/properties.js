@@ -14,6 +14,8 @@ const properties = [
     tokensSold: 650,
     status: 'Available',
     features: ['3 Bedrooms', '2 Bathrooms', '1,800 sq ft', 'Built in 2020', 'Doorman', 'Gym'],
+    bedrooms: 3,
+    bathrooms: 2,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Financial Projections', url: '#' },
@@ -35,6 +37,8 @@ const properties = [
     tokensSold: 1000,
     status: 'Sold Out',
     features: ['5 Bedrooms', '6 Bathrooms', '4,500 sq ft', 'Private Pool', 'Beach Access', 'Smart Home'],
+    bedrooms: 5,
+    bathrooms: 6,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Financial Projections', url: '#' },
@@ -56,6 +60,8 @@ const properties = [
     tokensSold: 300,
     status: 'Available',
     features: ['25,000 sq ft', '10 Floors', 'Parking Garage', 'LEED Certified', 'Conference Center', '24/7 Security'],
+    bedrooms: null,
+    bathrooms: null,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Tenant Agreements', url: '#' },
@@ -77,6 +83,8 @@ const properties = [
     tokensSold: 0,
     status: 'Coming Soon',
     features: ['4 Bedrooms', '3 Bathrooms', '2,800 sq ft', 'Hot Tub', 'Fireplace', '2-Car Garage'],
+    bedrooms: 4,
+    bathrooms: 3,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Financial Projections', url: '#' },
@@ -98,6 +106,8 @@ const properties = [
     tokensSold: 520,
     status: 'Available',
     features: ['2,000 sq ft', 'Corner Location', 'High Foot Traffic', 'Recently Renovated', 'Storage Space', 'Outdoor Seating'],
+    bedrooms: null,
+    bathrooms: null,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Market Analysis', url: '#' },
@@ -119,6 +129,8 @@ const properties = [
     tokensSold: 780,
     status: 'Available',
     features: ['4 Bedrooms', '3.5 Bathrooms', '3,200 sq ft', 'Original Hardwood Floors', 'Garden', 'Finished Basement'],
+    bedrooms: 4,
+    bathrooms: 3.5,
     documents: [
       { name: 'Property Deed', url: '#' },
       { name: 'Historic Designation', url: '#' },

@@ -27,6 +27,8 @@ export type Property = {
   lat?: number | null;
   lng?: number | null;
   unitMix?: string;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
   comps?: {
     address: string;
     soldDate: string;

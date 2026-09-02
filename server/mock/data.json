@@ -492,6 +492,35 @@
       "accredited": false,
       "walletAddress": null,
       "kyc": null
+    },
+    {
+      "id": 35,
+      "email": "kyc-1788352517600@example.com",
+      "name": "Kyc User",
+      "role": "user",
+      "password_hash": "$2b$10$InB4qtvvi27qtAFtRu0lyeY3m9nSvnpBFJo3IWFnIH6WunKz/l46K",
+      "kycStatus": "approved",
+      "accredited": true,
+      "walletAddress": "0x000000000000000000000000000001a0621dd6d7",
+      "kyc": {
+        "legalName": "Kyc User",
+        "country": "US",
+        "submittedAt": "2026-09-02T12:35:17.768Z",
+        "reviewedAt": "2026-09-02T12:35:17.846Z",
+        "reviewNote": null,
+        "provider": "mock"
+      }
+    },
+    {
+      "id": 36,
+      "email": "kyc2-1788352517851@example.com",
+      "name": "Other",
+      "role": "user",
+      "password_hash": "$2b$10$Zp9Jr4mRUVh.Tx8cguuy2eApoYsoavbmrF7f9AGxKePynEW8uwy.a",
+      "kycStatus": "unverified",
+      "accredited": false,
+      "walletAddress": null,
+      "kyc": null
     }
   ],
   "properties": [
@@ -571,7 +600,9 @@
       "galleryUrls": [
         "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1470&q=80"
-      ]
+      ],
+      "bedrooms": 3,
+      "bathrooms": 2
     },
     {
       "id": "2",
@@ -641,7 +672,9 @@
       ],
       "galleryUrls": [
         "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
-      ]
+      ],
+      "bedrooms": 5,
+      "bathrooms": 6
     },
     {
       "id": "3",
@@ -711,7 +744,9 @@
       ],
       "galleryUrls": [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
-      ]
+      ],
+      "bedrooms": null,
+      "bathrooms": null
     },
     {
       "id": "4",
@@ -768,7 +803,9 @@
       ],
       "galleryUrls": [
         "https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&auto=format&fit=crop&w=1530&q=80"
-      ]
+      ],
+      "bedrooms": 4,
+      "bathrooms": 3
     },
     {
       "id": "5",
@@ -838,7 +875,9 @@
       ],
       "galleryUrls": [
         "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80"
-      ]
+      ],
+      "bedrooms": null,
+      "bathrooms": null
     },
     {
       "id": "6",
@@ -908,7 +947,9 @@
       ],
       "galleryUrls": [
         "https://images.unsplash.com/photo-1448630360428-65456885c650?ixlib=rb-4.0.3&auto=format&fit=crop&w=1467&q=80"
-      ]
+      ],
+      "bedrooms": 4,
+      "bathrooms": 3.5
     }
   ],
   "activity": {

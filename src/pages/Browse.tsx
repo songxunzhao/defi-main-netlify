@@ -4,18 +4,37 @@ import { FilterIcon, SearchIcon, XIcon } from 'lucide-react';
 import { PropertyCard } from '../components/ui/PropertyCard';
 import { useProperties } from '../hooks/useProperties';
 import { Button } from '../components/ui/Button';
+import { meetsMinCount, propertyRoomCount, propertyWcCount } from '../utils/propertyCounts';
+
+const EMPTY_FILTERS = {
+  status: 'all',
+  minPrice: '',
+  maxPrice: '',
+  location: 'all',
+  rooms: 'all',
+  wcs: 'all',
+};
+
+const COUNT_OPTIONS = [
+  { value: 'all', label: 'Any' },
+  { value: '1', label: '1+' },
+  { value: '2', label: '2+' },
+  { value: '3', label: '3+' },
+  { value: '4', label: '4+' },
+  { value: '5', label: '5+' },
+];
+
+const selectClass =
+  'w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 focus:outline-none focus:ring-2 focus:ring-accent/40';
+const inputClass =
+  'w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 placeholder-cream-400/50 focus:outline-none focus:ring-2 focus:ring-accent/40';
 
 export default function Browse() {
   const { data: properties = [], isLoading, isError } = useProperties();
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    minPrice: '',
-    maxPrice: '',
-    location: 'all',
-  });
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   useEffect(() => {
     setFilteredProperties(properties);
@@ -47,11 +66,13 @@ export default function Browse() {
     if (filters.minPrice) result = result.filter((p) => p.price >= Number(filters.minPrice));
     if (filters.maxPrice) result = result.filter((p) => p.price <= Number(filters.maxPrice));
     if (filters.location !== 'all') result = result.filter((p) => p.location.includes(filters.location));
+    result = result.filter((p) => meetsMinCount(propertyRoomCount(p), filters.rooms));
+    result = result.filter((p) => meetsMinCount(propertyWcCount(p), filters.wcs));
     setFilteredProperties(result);
   };
 
   const resetFilters = () => {
-    setFilters({ status: 'all', minPrice: '', maxPrice: '', location: 'all' });
+    setFilters({ ...EMPTY_FILTERS });
     setSearchQuery('');
     setFilteredProperties(properties);
   };
@@ -122,13 +143,13 @@ export default function Browse() {
                     Reset
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   <div>
                     <label className="block text-sm font-medium text-cream-400 mb-2">Status</label>
                     <select
                       value={filters.status}
                       onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                      className="w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                      className={selectClass}
                     >
                       <option value="all">All</option>
                       <option value="Available">Available</option>
@@ -143,7 +164,7 @@ export default function Browse() {
                       placeholder="Min"
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                      className="w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 placeholder-cream-400/50 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                      className={inputClass}
                     />
                   </div>
                   <div>
@@ -153,7 +174,7 @@ export default function Browse() {
                       placeholder="Max"
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                      className="w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 placeholder-cream-400/50 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                      className={inputClass}
                     />
                   </div>
                   <div>
@@ -161,11 +182,35 @@ export default function Browse() {
                     <select
                       value={filters.location}
                       onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                      className="w-full bg-void-700 border border-void-600 rounded-xl px-4 py-2.5 text-cream-100 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                      className={selectClass}
                     >
                       <option value="all">All</option>
                       {locations.map((loc) => (
                         <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-2">Rooms</label>
+                    <select
+                      value={filters.rooms}
+                      onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
+                      className={selectClass}
+                    >
+                      {COUNT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-2">WCs</label>
+                    <select
+                      value={filters.wcs}
+                      onChange={(e) => setFilters({ ...filters, wcs: e.target.value })}
+                      className={selectClass}
+                    >
+                      {COUNT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
                       ))}
                     </select>
                   </div>

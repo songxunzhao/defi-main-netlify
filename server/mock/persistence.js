@@ -206,6 +206,14 @@ function ensureCmsDefaults() {
       property.galleryUrls = Array.isArray(seed.galleryUrls) ? seed.galleryUrls : [];
       changed = true;
     }
+    if (property.bedrooms === undefined) {
+      property.bedrooms = seed.bedrooms !== undefined ? seed.bedrooms : null;
+      changed = true;
+    }
+    if (property.bathrooms === undefined) {
+      property.bathrooms = seed.bathrooms !== undefined ? seed.bathrooms : null;
+      changed = true;
+    }
   }
   if (changed) writeFile(data);
 }

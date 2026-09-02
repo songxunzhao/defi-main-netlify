@@ -6,6 +6,7 @@ import { Property } from '../../utils/types';
 import { Badge } from './Badge';
 import { mediaUrl } from '../../utils/api';
 import { useOfferingAddress, useOfferingStats } from '../../hooks/useOffering';
+import { propertyRoomCount, propertyWcCount } from '../../utils/propertyCounts';
 
 type PropertyCardProps = {
   property: Property;
@@ -22,6 +23,8 @@ export function PropertyCard({
   const cap = stats.cap !== undefined ? Number(stats.cap) : property.totalTokens;
   const progressPercentage = cap > 0 ? (sold / cap) * 100 : 0;
   const remaining = stats.remaining !== undefined ? Number(stats.remaining) : Math.max(0, cap - sold);
+  const rooms = propertyRoomCount(property);
+  const wcs = propertyWcCount(property);
   const soldOut =
     property.status === 'Sold Out' ||
     Boolean(property.redemptionAddress) ||
@@ -83,6 +86,8 @@ export function PropertyCard({
               <TrendingUpIcon size={14} />
               {property.returnRate}% APY
             </span>
+            {rooms != null && <span>{rooms} {rooms === 1 ? 'room' : 'rooms'}</span>}
+            {wcs != null && <span>{wcs} {wcs === 1 ? 'WC' : 'WCs'}</span>}
             {property.occupancyPercent != null && <span>{property.occupancyPercent}% occ.</span>}
             <span>{sold} / {cap} shares</span>
           </div>

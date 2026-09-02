@@ -70,6 +70,12 @@ function asStrings(value, label) {
     .slice(0, 12);
 }
 
+function asCount(value, label) {
+  if (value === undefined) return undefined;
+  if (value === null || value === '') return null;
+  return asNumber(value, label, { min: 0, max: 50 });
+}
+
 function asCoord(value, label, { min, max } = {}) {
   if (value === undefined) return undefined;
   if (value === null || value === '') return null;
@@ -150,6 +156,8 @@ function create(input = {}) {
     lat: asCoord(input.lat, 'Latitude', { min: -90, max: 90 }) ?? null,
     lng: asCoord(input.lng, 'Longitude', { min: -180, max: 180 }) ?? null,
     unitMix: asString(input.unitMix, 'Unit mix', { max: 240 }) || '',
+    bedrooms: asCount(input.bedrooms, 'Rooms') ?? null,
+    bathrooms: asCount(input.bathrooms, 'WCs') ?? null,
     comps: asComps(input.comps) || [],
     grossRentMonthly: asNumber(input.grossRentMonthly, 'Gross rent') ?? null,
     opexMonthly: asNumber(input.opexMonthly, 'OpEx') ?? null,
@@ -193,6 +201,8 @@ function update(id, input = {}) {
   assign('lat', asCoord(input.lat, 'Latitude', { min: -90, max: 90 }));
   assign('lng', asCoord(input.lng, 'Longitude', { min: -180, max: 180 }));
   assign('unitMix', asString(input.unitMix, 'Unit mix', { max: 240 }));
+  assign('bedrooms', asCount(input.bedrooms, 'Rooms'));
+  assign('bathrooms', asCount(input.bathrooms, 'WCs'));
   assign('comps', asComps(input.comps));
   assign('grossRentMonthly', asNumber(input.grossRentMonthly, 'Gross rent', { min: 0 }));
   assign('opexMonthly', asNumber(input.opexMonthly, 'OpEx', { min: 0 }));

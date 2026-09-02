@@ -30,6 +30,8 @@ export function AddPropertyModal({ isOpen, onClose, onCreated }: AddPropertyModa
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
   const [unitMix, setUnitMix] = useState('');
+  const [bedrooms, setBedrooms] = useState('');
+  const [bathrooms, setBathrooms] = useState('');
   const [docName, setDocName] = useState('PPM');
   const [docFile, setDocFile] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -50,6 +52,8 @@ export function AddPropertyModal({ isOpen, onClose, onCreated }: AddPropertyModa
     setLat('');
     setLng('');
     setUnitMix('');
+    setBedrooms('');
+    setBathrooms('');
     setDocName('PPM');
     setDocFile(null);
     setError('');
@@ -81,6 +85,8 @@ export function AddPropertyModal({ isOpen, onClose, onCreated }: AddPropertyModa
         lat: lat === '' ? undefined : Number(lat),
         lng: lng === '' ? undefined : Number(lng),
         unitMix,
+        bedrooms: bedrooms === '' ? null : Number(bedrooms),
+        bathrooms: bathrooms === '' ? null : Number(bathrooms),
         status: 'Coming Soon',
         documents: [],
       });
@@ -197,6 +203,16 @@ export function AddPropertyModal({ isOpen, onClose, onCreated }: AddPropertyModa
                   <div>
                     <label className="block text-sm font-medium text-cream-400 mb-1.5">Longitude</label>
                     <input className={fieldClass} value={lng} onChange={(e) => setLng(e.target.value)} placeholder="-97.7431" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-1.5">Rooms</label>
+                    <input className={fieldClass} type="number" min={0} step="1" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} placeholder="3" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-cream-400 mb-1.5">WCs</label>
+                    <input className={fieldClass} type="number" min={0} step="0.5" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} placeholder="2" />
                   </div>
                 </div>
                 <div>
