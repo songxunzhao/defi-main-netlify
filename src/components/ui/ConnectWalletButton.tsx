@@ -10,7 +10,7 @@ import { XIcon } from 'lucide-react';
  * the wallet modal. Flip this constant, or set
  * VITE_SIMULATE_WALLET_EXTENSION_ERROR=true|false in .env.
  */
-const SIMULATE_WALLET_EXTENSION_ERROR_DEFAULT = true;
+const SIMULATE_WALLET_EXTENSION_ERROR_DEFAULT = false;
 
 export function simulateWalletExtensionErrorEnabled(): boolean {
   const env = import.meta.env.VITE_SIMULATE_WALLET_EXTENSION_ERROR?.trim().toLowerCase();
