@@ -5,7 +5,7 @@ type EthereumProvider = {
   on?: (event: string, listener: (...args: any[]) => void) => void;
   removeListener?: (event: string, listener: (...args: any[]) => void) => void;
 };
-type BrowserWallet = { id: string; name: string; provider: EthereumProvider };
+type BrowserWallet = { id: string; name: string; icon?: string; provider: EthereumProvider };
 type EthereumState = {
   wallets: BrowserWallet[];
   address: string;
@@ -13,7 +13,7 @@ type EthereumState = {
   connecting: boolean;
   error: string;
   discover: () => void;
-  connect: (wallet: BrowserWallet) => Promise<void>;
+  connect: (wallet: BrowserWallet) => Promise<boolean>;
   disconnect: () => void;
 };
 const EthereumContext = createContext<EthereumState | null>(null);
@@ -42,7 +42,9 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
     const announce = (event: Event) => {
       const detail = (event as CustomEvent).detail;
       if (typeof detail?.info?.uuid !== 'string' || typeof detail?.info?.name !== 'string' || typeof detail?.provider?.request !== 'function') return;
-      const wallet = { id: detail.info.uuid, name: detail.info.name, provider: detail.provider };
+      const icon = typeof detail.info.icon === 'string' && /^data:image\//i.test(detail.info.icon)
+        ? detail.info.icon : undefined;
+      const wallet = { id: detail.info.uuid, name: detail.info.name, icon, provider: detail.provider };
       setWallets((current) => [...current.filter((item) => item.id !== wallet.id && item.provider !== wallet.provider), wallet]);
     };
     window.addEventListener('eip6963:announceProvider', announce);
@@ -65,7 +67,7 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
   }, []);
 
   const connect = useCallback(async (wallet: BrowserWallet) => {
-    if (pending.current) return;
+    if (pending.current) return false;
     pending.current = true;
     const current = ++attempt.current;
     setConnecting(true);
@@ -75,15 +77,17 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
       if (!Array.isArray(accounts) || !validAddress(accounts[0])) throw new Error('The wallet did not return an Ethereum address.');
       const chain = await wallet.provider.request({ method: 'eth_chainId' });
       if (typeof chain !== 'string' || !/^0x[0-9a-f]+$/i.test(chain)) throw new Error('The wallet returned an invalid network.');
-      if (current !== attempt.current) return;
+      if (current !== attempt.current) return false;
       setProvider(wallet.provider);
       setAddress(accounts[0]);
       setChainId(chain);
+      return true;
     } catch (err) {
       if (current === attempt.current) {
         const failure = err as { code?: number; message?: string };
         setError(failure.code === 4001 ? 'Wallet connection was declined. Try again when ready.' : failure.message || 'Could not connect the Ethereum wallet.');
       }
+      return false;
     } finally {
       if (current === attempt.current) {
         pending.current = false;
