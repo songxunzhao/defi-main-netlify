@@ -5,11 +5,19 @@ type EthereumProvider = {
   on?: (event: string, listener: (...args: any[]) => void) => void;
   removeListener?: (event: string, listener: (...args: any[]) => void) => void;
 };
-type BrowserWallet = { id: string; name: string; icon?: string; provider: EthereumProvider };
+export type BrowserWallet = {
+  id: string;
+  name: string;
+  icon?: string;
+  rdns?: string;
+  source: 'eip6963' | 'legacy';
+  provider: EthereumProvider;
+};
 type EthereumState = {
   wallets: BrowserWallet[];
   address: string;
   chainId: string;
+  connectedWalletId: string | null;
   connecting: boolean;
   error: string;
   discover: () => void;
@@ -33,8 +41,11 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
     window.dispatchEvent(new Event('eip6963:requestProvider'));
     const legacy = (window as Window & { ethereum?: EthereumProvider }).ethereum;
     if (legacy?.request) {
-      setWallets((current) => current.some((wallet) => wallet.provider === legacy)
-        ? current : [...current, { id: 'injected', name: 'Browser Ethereum wallet', provider: legacy }]);
+      // window.ethereum can be a different wrapper around an announced wallet.
+      // Only use it when no wallet supports standard discovery.
+      setWallets((current) => current.some((wallet) => wallet.source === 'eip6963')
+        ? current.filter((wallet) => wallet.source !== 'legacy')
+        : [{ id: 'injected', name: 'Browser Ethereum wallet', source: 'legacy', provider: legacy }]);
     }
   }, []);
 
@@ -42,10 +53,26 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
     const announce = (event: Event) => {
       const detail = (event as CustomEvent).detail;
       if (typeof detail?.info?.uuid !== 'string' || typeof detail?.info?.name !== 'string' || typeof detail?.provider?.request !== 'function') return;
+      const name = detail.info.name.trim();
+      if (!name) return;
+      const rdns = typeof detail.info.rdns === 'string' ? detail.info.rdns.trim().toLowerCase() || undefined : undefined;
       const icon = typeof detail.info.icon === 'string' && /^data:image\//i.test(detail.info.icon)
         ? detail.info.icon : undefined;
-      const wallet = { id: detail.info.uuid, name: detail.info.name, icon, provider: detail.provider };
-      setWallets((current) => [...current.filter((item) => item.id !== wallet.id && item.provider !== wallet.provider), wallet]);
+      setWallets((current) => {
+        // Some extensions re-announce with a new UUID and provider wrapper.
+        // Prefer the stable wallet identity and preserve its original provider
+        // so rediscovery cannot redirect a selected wallet's connection.
+        const existing = current.find((item) => item.source === 'eip6963' && (
+          item.provider === detail.provider
+          || item.id === detail.info.uuid
+          || (rdns && item.rdns === rdns)
+          || ((!rdns || !item.rdns) && item.name.toLowerCase() === name.toLowerCase())
+        ));
+        const discovered = current.filter((item) => item.source !== 'legacy');
+        if (existing) return discovered.map((item) => item === existing
+          ? { ...item, rdns: item.rdns || rdns, icon: item.icon || icon } : item);
+        return [...discovered, { id: detail.info.uuid, name, rdns, icon, source: 'eip6963', provider: detail.provider }];
+      });
     };
     window.addEventListener('eip6963:announceProvider', announce);
     discover();
@@ -116,7 +143,8 @@ export function EthereumWalletProvider({ children }: { children: React.ReactNode
     };
   }, [provider, disconnect]);
 
-  return <EthereumContext.Provider value={{ wallets, address, chainId, connecting, error, discover, connect, disconnect }}>{children}</EthereumContext.Provider>;
+  const connectedWalletId = wallets.find((wallet) => wallet.provider === provider)?.id || null;
+  return <EthereumContext.Provider value={{ wallets, address, chainId, connectedWalletId, connecting, error, discover, connect, disconnect }}>{children}</EthereumContext.Provider>;
 }
 
 export function useEthereumWallet() {

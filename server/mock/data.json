@@ -627,15 +627,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/1-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/1-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/1-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "returnRate": 8.2,
@@ -774,7 +774,8 @@
           "offer": null
         }
       },
-      "sharePriceUsdc": 10
+      "sharePriceUsdc": 10,
+      "sampleDocumentsVersion": 2
     },
     {
       "id": "2",
@@ -798,15 +799,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/2-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/2-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/2-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "returnRate": 10.5,
@@ -893,7 +894,8 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "id": "3",
@@ -917,15 +919,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/3-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
-          "name": "Tenant Agreements",
-          "url": "/api/vault/seed/3-inspection.pdf"
+          "name": "Inspection Report",
+          "url": "/api/vault/seed/sample-inspection.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/3-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         }
       ],
       "returnRate": 7.8,
@@ -1002,7 +1004,8 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "id": "4",
@@ -1026,15 +1029,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/4-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/4-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/4-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "returnRate": 9.1,
@@ -1103,7 +1106,8 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "id": "5",
@@ -1127,15 +1131,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/5-deed.pdf"
-        },
-        {
-          "name": "Market Analysis",
-          "url": "/api/vault/seed/5-financials.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/5-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
+        },
+        {
+          "name": "Inspection Report",
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "returnRate": 8.7,
@@ -1212,7 +1216,8 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "id": "6",
@@ -1236,15 +1241,15 @@
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/6-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
-          "name": "Historic Designation",
-          "url": "/api/vault/seed/6-financials.pdf"
+          "name": "Financial Projections",
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
-          "name": "Renovation Permits",
-          "url": "/api/vault/seed/6-financials.pdf"
+          "name": "Inspection Report",
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "returnRate": 6.9,
@@ -1331,21 +1336,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/7-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/7-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/7-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.92,
@@ -1429,21 +1435,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/8-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/8-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/8-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.64,
@@ -1522,21 +1529,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/9-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/9-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/9-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.78,
@@ -1615,21 +1623,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/10-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/10-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/10-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.615,
@@ -1708,21 +1717,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/11-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/11-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/11-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.39,
@@ -1801,21 +1811,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/12-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/12-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/12-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 2.1,
@@ -1894,21 +1905,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/13-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/13-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/13-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.725,
@@ -1981,21 +1993,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/14-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/14-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/14-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 1.45,
@@ -2074,21 +2087,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/15-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/15-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/15-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.98,
@@ -2167,21 +2181,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/16-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/16-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/16-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.535,
@@ -2260,21 +2275,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/17-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/17-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/17-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 4.2,
@@ -2353,21 +2369,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/18-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/18-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/18-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.89,
@@ -2446,21 +2463,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/19-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/19-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/19-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 1.6,
@@ -2539,21 +2557,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/20-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/20-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/20-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 2.35,
@@ -2632,21 +2651,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/21-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/21-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/21-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 1.1,
@@ -2725,21 +2745,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/22-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/22-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/22-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 2.75,
@@ -2818,21 +2839,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/23-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/23-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/23-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 1.95,
@@ -2911,21 +2933,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/24-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/24-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/24-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 3.2,
@@ -3004,21 +3027,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/25-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/25-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/25-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 0.98,
@@ -3097,21 +3121,22 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     },
     {
       "documents": [
         {
           "name": "Property Deed",
-          "url": "/api/vault/seed/26-deed.pdf"
+          "url": "/api/vault/seed/sample-deed.pdf"
         },
         {
           "name": "Financial Projections",
-          "url": "/api/vault/seed/26-financials.pdf"
+          "url": "/api/vault/seed/sample-financials.pdf"
         },
         {
           "name": "Inspection Report",
-          "url": "/api/vault/seed/26-inspection.pdf"
+          "url": "/api/vault/seed/sample-inspection.pdf"
         }
       ],
       "tokenPrice": 5.4,
@@ -3190,7 +3215,8 @@
           "burned": 0,
           "contract": null
         }
-      }
+      },
+      "sampleDocumentsVersion": 2
     }
   ],
   "activity": {

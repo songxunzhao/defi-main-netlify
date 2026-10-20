@@ -51,7 +51,7 @@ export function SolanaProviders({ children }: { children: React.ReactNode }) {
   return (
     <WalletNoticeContext.Provider value={noticeValue}>
       <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect onError={onError}>
+        <WalletProvider wallets={wallets} autoConnect={false} onError={onError}>
           <WalletModalProvider>{children}</WalletModalProvider>
         </WalletProvider>
       </ConnectionProvider>

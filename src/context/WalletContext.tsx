@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { openWalletDemo } from '../utils/walletDemo';
 import { useEthereumWallet } from './EthereumContext';
 import { useAccount, useDisconnect } from '../solana/wagmi';
 
@@ -28,7 +28,6 @@ export function WalletProvider({
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { disconnect: disconnectEthereum } = useEthereumWallet();
-  const { setVisible } = useWalletModal();
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Check if connected address is an admin
@@ -41,7 +40,7 @@ export function WalletProvider({
     }
   }, [address, isConnected]);
 
-  const connectWallet = useCallback(() => setVisible(true), [setVisible]);
+  const connectWallet = useCallback(() => { openWalletDemo(); }, []);
 
   const disconnectWallet = () => {
     disconnect().catch(() => undefined);
