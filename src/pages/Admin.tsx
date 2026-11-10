@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { BanknoteIcon, Building2Icon, CoinsIcon, HandCoinsIcon, KeyRoundIcon, LandmarkIcon, LineChartIcon, ShieldIcon, UsersIcon, type LucideIcon } from 'lucide-react';
+import { ArrowRightIcon, RefreshCwIcon, SearchIcon, LayoutDashboardIcon, AlertCircleIcon, CheckCircle2Icon, InboxIcon, ChevronRightIcon, BanknoteIcon, Building2Icon, CoinsIcon, HandCoinsIcon, KeyRoundIcon, LandmarkIcon, LineChartIcon, ShieldIcon, UsersIcon, type LucideIcon } from 'lucide-react';
 import { PropertyIncomePanel } from '../components/property/PropertyIncomePanel';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -13,11 +13,24 @@ import { GrowthChart } from '../components/admin/GrowthChart';
 import { LoginAttempts } from '../components/admin/LoginAttempts';
 import { PropertyThumb } from '../components/ui/PropertyThumb';
 import { formatUsd } from '../utils/ops';
+import '../styles/admin.css';
 
 const SECTIONS = ['dashboard', 'properties', 'tokens', 'owners', 'investors', 'market', 'lending', 'distributions', 'financials', 'compliance'] as const;
 
 const STAGES = ['draft', 'review', 'approved', 'tokenized', 'funded', 'active'];
-const fieldClass = 'mt-1 w-full bg-void-700 border border-void-600 rounded-xl px-3 py-2 text-cream-100 text-sm';
+const fieldClass = 'admin-field';
+const SECTION_DETAILS = {
+  dashboard: { label: 'Overview', description: 'Your platform at a glance.', icon: LayoutDashboardIcon },
+  properties: { label: 'Properties', description: 'Review listings, verify ownership, and manage the property lifecycle.', icon: Building2Icon },
+  tokens: { label: 'Tokenization', description: 'Configure issuance terms and manage trading permissions.', icon: CoinsIcon },
+  owners: { label: 'Property owners', description: 'Manage onboarding, property ownership, and account access.', icon: KeyRoundIcon },
+  investors: { label: 'Investors', description: 'Review investor identity, holdings, and account restrictions.', icon: UsersIcon },
+  market: { label: 'Marketplace', description: 'Monitor trading activity, orders, and transaction fees.', icon: LineChartIcon },
+  lending: { label: 'Lending', description: 'Monitor pool liquidity, collateral, and loan health.', icon: HandCoinsIcon },
+  distributions: { label: 'Distributions', description: 'Manage rental income and review distribution records.', icon: BanknoteIcon },
+  financials: { label: 'Financials', description: 'Review property income, expenses, and allocation.', icon: LandmarkIcon },
+  compliance: { label: 'Compliance', description: 'Review account exceptions and the administrative audit trail.', icon: ShieldIcon },
+};
 
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
@@ -36,7 +49,7 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const { data: catalog = [] } = useProperties();
   const isAdmin = user?.role === 'admin';
-  const { data: desk, isLoading } = useQuery({
+  const { data: desk, isLoading, error: loadError, refetch, isFetching, dataUpdatedAt } = useQuery({
     queryKey: ['admin-desk'],
     queryFn: fetchAdmin,
     enabled: isAdmin,
@@ -78,12 +91,14 @@ export default function Admin() {
   }, [selected?.id]);
 
   const run = async (key: string, payload: Record<string, unknown>, message: string) => {
+    if (busy) return;
     setError('');
     setNotice('');
     setBusy(key);
     try {
       const next = await adminAction(payload);
       queryClient.setQueryData(['admin-desk'], next);
+      void queryClient.invalidateQueries({ queryKey: ['properties'] });
       setNotice(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed.');
@@ -105,38 +120,42 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-        {notice && <p className="text-emerald-300 text-sm mb-3">{notice}</p>}
-        <div>
-          <div className="min-w-0">
-            {isLoading || !desk ? (
-              <p className="text-cream-400">Loading the console…</p>
-            ) : section === 'dashboard' ? (
-              <Dashboard desk={desk} onOpen={setSection} />
-            ) : (
-              <Console
-                section={section}
-                desk={desk}
-                selectedId={selected?.id || ''}
-                onSelect={setPropertyId}
-                edit={edit}
-                setEdit={setEdit}
-                valuation={valuation}
-                setValuation={setValuation}
-                token={token}
-                setToken={setToken}
-                mintShares={mintShares}
-                setMintShares={setMintShares}
-                feeBps={feeBps}
-                setFeeBps={setFeeBps}
-                busy={busy}
-                run={run}
-                onDocs={setVaultId}
-              />
-            )}
-          </div>
+    <div className="admin-workspace min-h-screen w-full">
+      <div className="admin-shell">
+        <aside className="admin-sidebar" aria-label="Administration navigation">
+          <div className="admin-sidebar-caption">Workspace</div>
+          {SECTIONS.map((id) => {
+            const item = SECTION_DETAILS[id];
+            const Icon = item.icon;
+            return <Link key={id} to={id === 'dashboard' ? '/admin' : `/admin?section=${id}`} aria-current={section === id ? 'page' : undefined} className={`admin-nav-item ${section === id ? 'is-active' : ''}`}><Icon size={17} /><span>{item.label}</span>{section === id && <ChevronRightIcon size={14} className="ml-auto" />}</Link>;
+          })}
+          <div className="admin-sidebar-caption mt-8">Connected workspaces</div>
+          <Link className="admin-nav-item" to="/institution"><Building2Icon size={17} />Block quotes<ArrowRightIcon size={14} className="ml-auto" /></Link>
+          <Link className="admin-nav-item" to="/governance"><ShieldIcon size={17} />Governance<ArrowRightIcon size={14} className="ml-auto" /></Link>
+          <div className="admin-sidebar-note"><ShieldIcon size={17} /><span>Administrator workspace<br /><span className="text-cream-400">Role-based access</span></span></div>
+        </aside>
+        <div className="admin-main min-w-0">
+          <div className="admin-breadcrumb">Administration <ChevronRightIcon size={13} /><span>{SECTION_DETAILS[section].label}</span></div>
+          <header className="admin-page-heading">
+            <div><h1>{section === 'dashboard' ? 'Platform overview' : SECTION_DETAILS[section].label}</h1><p>{SECTION_DETAILS[section].description}</p></div>
+            <div className="flex items-center gap-3">
+              {dataUpdatedAt > 0 && <span className="hidden sm:block text-xs text-cream-400">Updated {new Date(dataUpdatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
+              <Button variant="outline" size="sm" disabled={isFetching || Boolean(busy)} onClick={() => { void refetch(); }} icon={<RefreshCwIcon size={14} className={isFetching ? 'animate-spin' : ''} />}>{isFetching ? 'Refreshing…' : 'Refresh'}</Button>
+            </div>
+          </header>
+          {error && <div role="alert" className="admin-message admin-message-error"><AlertCircleIcon size={18} />{error}</div>}
+          {notice && <div role="status" className="admin-message admin-message-success"><CheckCircle2Icon size={18} />{notice}</div>}
+          {loadError && <div role="alert" className="admin-message admin-message-error"><AlertCircleIcon size={18} /><div>Unable to refresh the console.<p className="text-xs mt-1">{loadError instanceof Error ? loadError.message : 'Please try again.'}</p></div><button className="ml-auto underline" onClick={() => void refetch()}>Retry</button></div>}
+          {isLoading ? (
+            <div role="status" aria-label="Loading console" className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-pulse">{[0, 1, 2, 3, 4, 5].map((id) => <div key={id} className="h-40 rounded-xl border border-void-700 bg-void-800" />)}<span className="sr-only">Loading console…</span></div>
+          ) : desk ? section === 'dashboard' ? (
+            <Dashboard desk={desk} onOpen={setSection} />
+          ) : (
+            <fieldset className="admin-console" disabled={Boolean(busy)} aria-busy={Boolean(busy)}>
+              {busy && <div role="status" className="admin-saving"><RefreshCwIcon size={14} className="animate-spin" />Saving changes…</div>}
+              <Console section={section} desk={desk} selectedId={selected?.id || ''} onSelect={setPropertyId} edit={edit} setEdit={setEdit} valuation={valuation} setValuation={setValuation} token={token} setToken={setToken} mintShares={mintShares} setMintShares={setMintShares} feeBps={feeBps} setFeeBps={setFeeBps} busy={busy} run={run} onDocs={setVaultId} />
+            </fieldset>
+          ) : !loadError && <div className="admin-empty"><InboxIcon size={28} /><h3>No console data available</h3><p>Refresh to load the latest platform records.</p></div>}
         </div>
       </div>
       <DocumentVaultModal
@@ -220,7 +239,7 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
       stats: [
         ['Sold', sum(desk.properties.map((row) => row.tokensSold)).toLocaleString()],
         ['Supply', sum(desk.properties.map((row) => row.totalTokens)).toLocaleString()],
-        ['Investor value', `$${formatUsd(growth.sold.at(-1)?.value || 0)}`],
+        ['Investor value', `$${formatUsd(growth.sold[growth.sold.length - 1]?.value || 0)}`],
       ],
     },
     {
@@ -289,20 +308,25 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-cream-100">Dashboard</h1>
-        <p className="text-cream-400 mt-1">Growth for the last 60 sessions, then the current book for each department.</p>
+      <div className="admin-metrics">
+        {[
+          { label: 'Assets under management', value: `$${formatUsd(aum)}`, note: `${desk.properties.length} properties in portfolio`, icon: Building2Icon },
+          { label: 'Monthly net income', value: `$${formatUsd(net)}`, note: 'After expenses and management fees', icon: BanknoteIcon },
+          { label: 'Investor accounts', value: desk.investors.length.toLocaleString(), note: `${desk.investors.filter((row) => row.kycStatus === 'approved').length} identity verified`, icon: UsersIcon },
+          { label: 'Outstanding debt', value: `$${formatUsd(debt)}`, note: `${desk.lending.loans.length} loans in the lending book`, icon: HandCoinsIcon },
+        ].map(({ label, value, note, icon: Icon }) => <div className="admin-metric" key={label}><div className="flex items-center justify-between"><span>{label}</span><Icon size={17} className="text-accent" /></div><strong>{value}</strong><p>{note}</p></div>)}
+      </div>
+      <div className="admin-attention">
+        <div className="flex items-center gap-3"><span className="admin-icon-tile"><ShieldIcon size={19} /></span><div><h2>Review queue</h2><p>{pending} pending identity reviews · {flagged} flagged or restricted accounts · {desk.properties.filter((row) => row.stage === 'review').length} properties in review</p></div></div>
+        <Button size="sm" variant="outline" onClick={() => onOpen('compliance')} icon={<ArrowRightIcon size={14} />}>Open compliance</Button>
       </div>
       <section className="mb-8">
-        <LoginAttempts />
-      </section>
-      <section className="mb-8">
-        <h2 className="font-display text-lg font-semibold text-cream-100 mb-3">Growth</h2>
+        <div className="admin-section-heading"><div><h2>Platform performance</h2><p>Recorded history across the latest 60 sessions</p></div><span className="admin-label">Historical activity</span></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {charts.map((chart) => {
             const change = changeLabel(chart.points);
             return (
-              <div key={chart.title} className="rounded-2xl border border-void-700 bg-void-800/40 p-4">
+              <div key={chart.title} className="admin-chart-card">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <h3 className="text-sm font-medium text-cream-100">{chart.title}</h3>
                   {change && (
@@ -316,7 +340,7 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
         </div>
       </section>
       <section>
-        <h2 className="font-display text-lg font-semibold text-cream-100 mb-3">Departments</h2>
+        <div className="admin-section-heading"><div><h2>Operations</h2><p>Manage platform activity by department</p></div></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {departments.map((department) => {
             const Icon = department.icon;
@@ -325,7 +349,7 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
                 key={department.id}
                 type="button"
                 onClick={() => onOpen(department.id)}
-                className="text-left rounded-2xl border border-void-700 bg-void-800/40 p-4 hover:border-accent/40"
+                className="admin-department"
               >
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2 min-w-0">
@@ -334,7 +358,7 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
                     </span>
                     <span className="font-medium text-cream-100">{department.title}</span>
                   </div>
-                  <span className="text-xs text-accent">Manage</span>
+                  <ArrowRightIcon size={16} className="text-cream-400" />
                 </div>
                 <dl className="space-y-1.5">
                   {department.stats.map(([label, value]) => (
@@ -349,30 +373,18 @@ function Dashboard({ desk, onOpen }: { desk: AdminDesk; onOpen: (id: (typeof SEC
           })}
         </div>
       </section>
+      <section className="mt-8"><LoginAttempts /></section>
     </div>
   );
 }
 
 function PropertySelect({ desk, value, onChange }: { desk: AdminDesk; value: string; onChange: (id: string) => void }) {
   return (
-    <div className="mb-4">
-      <p className="text-sm text-cream-400 mb-2">Property</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
-        {desk.properties.map((row) => {
-          const active = row.id === value;
-          return (
-            <button
-              key={row.id}
-              type="button"
-              onClick={() => onChange(row.id)}
-              className={`flex items-center gap-3 text-left rounded-xl border px-3 py-2 ${active ? 'border-accent bg-accent/10' : 'border-void-700 bg-void-800/40 hover:border-void-600'}`}
-            >
-              <PropertyThumb title={row.title} imageUrl={row.imageUrl} className="h-12 w-16" />
-              <span className="text-sm text-cream-100 font-medium min-w-0 truncate">{row.title}</span>
-            </button>
-          );
-        })}
-      </div>
+    <div className="admin-property-select">
+      <label htmlFor="admin-property">Selected property<span>Choose the asset you want to manage</span></label>
+      <select id="admin-property" className={fieldClass} value={value} onChange={(event) => onChange(event.target.value)}>
+        {desk.properties.map((row) => <option key={row.id} value={row.id}>{row.title} · {row.stage}</option>)}
+      </select>
     </div>
   );
 }
@@ -398,7 +410,10 @@ function Console(props: {
 }) {
   const { section, desk, selectedId, onSelect, run, busy } = props;
   const property = desk.properties.find((row) => row.id === selectedId) || desk.properties[0];
-  if (!property) return <p className="text-cream-400">No properties on the platform.</p>;
+  if (section === 'owners') return <Accounts title="Owner management" copy="Onboarding, identity, ownership, wallet, listings, and payouts." rows={desk.owners} desk={desk} run={run} busy={busy} kind="owner" />;
+  if (section === 'investors') return <Accounts title="Investor management" copy="Identity, accreditation, wallets, holdings, cash, and restrictions." rows={desk.investors} desk={desk} run={run} busy={busy} kind="investor" />;
+
+  if (!property && ['properties', 'tokens', 'market', 'distributions', 'financials'].includes(section)) return <div className="admin-empty"><Building2Icon size={30} /><h3>No properties available</h3><p>Property submissions will appear here when owners add their listings.</p></div>;
 
   if (section === 'properties') {
     return (
@@ -442,16 +457,16 @@ function Console(props: {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); run('value', { type: 'property-valuation', id: property.id, usd: Number(props.valuation) }, 'Valuation saved.'); }}>
             <label className="text-sm text-cream-400">Valuation (USD)
-              <input value={props.valuation} onChange={(event) => props.setValuation(event.target.value)} className={fieldClass} />
+              <input type="number" min="0" step="0.01" required value={props.valuation} onChange={(event) => props.setValuation(event.target.value)} className={fieldClass} />
             </label>
             <Button type="submit" size="sm" disabled={busy === 'value'}>Save valuation</Button>
           </form>
           <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); run('edit', { type: 'property-edit', id: property.id, ...props.edit }, 'Listing updated.'); }}>
             <label className="text-sm text-cream-400">Title
-              <input value={props.edit.title} onChange={(event) => props.setEdit({ ...props.edit, title: event.target.value })} className={fieldClass} />
+              <input required value={props.edit.title} onChange={(event) => props.setEdit({ ...props.edit, title: event.target.value })} className={fieldClass} />
             </label>
             <label className="text-sm text-cream-400">Location
-              <input value={props.edit.location} onChange={(event) => props.setEdit({ ...props.edit, location: event.target.value })} className={fieldClass} />
+              <input required value={props.edit.location} onChange={(event) => props.setEdit({ ...props.edit, location: event.target.value })} className={fieldClass} />
             </label>
             <label className="text-sm text-cream-400">Description
               <textarea value={props.edit.description} onChange={(event) => props.setEdit({ ...props.edit, description: event.target.value })} rows={3} className={fieldClass} />
@@ -477,23 +492,23 @@ function Console(props: {
         <PropertySelect desk={desk} value={property.id} onChange={onSelect} />
         <p className="text-cream-300 text-sm mb-4">
           Supply {property.token.totalSupply} · price ${formatUsd(property.token.price)} · owner {property.token.ownerPercent}% · minted {property.token.minted} · burned {property.token.burned}
-          {property.token.contract ? ` · ${property.token.contract}` : ' · demo ledger, no contract address yet'}
+          {property.token.contract ? ` · ${property.token.contract}` : ' · Ledger only; no deployed contract'}
         </p>
         <form className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4" onSubmit={(event) => { event.preventDefault(); run('token', { type: 'token-set', id: property.id, totalSupply: Number(props.token.supply), price: Number(props.token.price), ownerPercent: Number(props.token.ownerPercent) }, 'Token terms saved.'); }}>
           <label className="text-sm text-cream-400">Total supply
-            <input value={props.token.supply} onChange={(event) => props.setToken({ ...props.token, supply: event.target.value })} className={fieldClass} />
+            <input type="number" min="1" step="1" required value={props.token.supply} onChange={(event) => props.setToken({ ...props.token, supply: event.target.value })} className={fieldClass} />
           </label>
           <label className="text-sm text-cream-400">Initial price (USDC)
-            <input value={props.token.price} onChange={(event) => props.setToken({ ...props.token, price: event.target.value })} className={fieldClass} />
+            <input type="number" min="0.01" step="0.01" required value={props.token.price} onChange={(event) => props.setToken({ ...props.token, price: event.target.value })} className={fieldClass} />
           </label>
           <label className="text-sm text-cream-400">Owner percentage
-            <input value={props.token.ownerPercent} onChange={(event) => props.setToken({ ...props.token, ownerPercent: event.target.value })} className={fieldClass} />
+            <input type="number" min="0" max="100" step="0.01" required value={props.token.ownerPercent} onChange={(event) => props.setToken({ ...props.token, ownerPercent: event.target.value })} className={fieldClass} />
           </label>
           <div className="md:col-span-3"><Button type="submit" size="sm" disabled={busy === 'token'}>Save token</Button></div>
         </form>
         <div className="flex flex-wrap items-end gap-2">
           <label className="text-sm text-cream-400">Shares
-            <input value={props.mintShares} onChange={(event) => props.setMintShares(event.target.value)} className={fieldClass} />
+            <input type="number" min="1" step="1" required value={props.mintShares} onChange={(event) => props.setMintShares(event.target.value)} className={fieldClass} />
           </label>
           <Button size="sm" disabled={busy === 'mint'} onClick={() => run('mint', { type: 'token-mint', id: property.id, shares: Number(props.mintShares) }, 'Tokens minted.')}>Mint</Button>
           <Button size="sm" variant="outline" disabled={busy === 'burn'} onClick={() => run('burn', { type: 'token-burn', id: property.id, shares: Number(props.mintShares) }, 'Tokens burned.')}>Burn</Button>
@@ -508,19 +523,17 @@ function Console(props: {
     );
   }
 
-  if (section === 'owners') return <Accounts title="Owner management" copy="Onboarding, identity, ownership, wallet, listings, and payouts." rows={desk.owners} desk={desk} run={run} busy={busy} kind="owner" />;
-  if (section === 'investors') return <Accounts title="Investor management" copy="Identity, accreditation, wallets, holdings, cash, and restrictions." rows={desk.investors} desk={desk} run={run} busy={busy} kind="investor" />;
 
   if (section === 'market') {
     return (
       <div>
         <h2 className="font-display text-xl font-semibold text-cream-100 mb-1">Marketplace</h2>
-        <p className="text-cream-400 text-sm mb-4">Open orders, prints, volume, rejected orders, and the per-property trading fee.</p>
+        <p className="text-cream-400 text-sm mb-4">Monitor open orders, executed trades, and rejected orders. Configure trading fees for the selected property.</p>
         <p className="text-cream-100 mb-4">Volume ${formatUsd(desk.market.volume)}</p>
         <PropertySelect desk={desk} value={property.id} onChange={onSelect} />
         <form className="flex items-end gap-2 mb-6" onSubmit={(event) => { event.preventDefault(); run('fee', { type: 'market-fee', id: property.id, feeBps: Number(props.feeBps) }, 'Fee updated.'); }}>
           <label className="text-sm text-cream-400">Fee (bps)
-            <input value={props.feeBps} onChange={(event) => props.setFeeBps(event.target.value)} className={fieldClass} />
+            <input type="number" min="0" max="10000" step="1" required value={props.feeBps} onChange={(event) => props.setFeeBps(event.target.value)} className={fieldClass} />
           </label>
           <Button type="submit" size="sm">Save fee</Button>
           <span className="text-cream-400 text-sm pb-2">{property.tradingPaused ? 'Trading paused' : 'Trading open'}</span>
@@ -652,13 +665,21 @@ function Accounts({ title, copy, rows, desk, run, busy, kind }: {
   busy: string;
   kind: 'owner' | 'investor';
 }) {
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('all');
+  const filtered = rows.filter((row) => `${row.name} ${row.email} ${row.walletAddress || ''}`.toLowerCase().includes(search.toLowerCase()) && (status === 'all' || (status === 'flagged' ? row.suspicious || row.suspended || row.restricted : row.kycStatus === status)));
   return (
     <div>
       <h2 className="font-display text-xl font-semibold text-cream-100 mb-1">{title}</h2>
       <p className="text-cream-400 text-sm mb-4">{copy}</p>
+      <div className="admin-filter-bar">
+        <label className="admin-search"><SearchIcon size={16} /><input aria-label="Search accounts" placeholder="Search name, email, or wallet…" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+        <select aria-label="Filter accounts by status" className={fieldClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">All statuses</option><option value="pending">Pending review</option><option value="approved">Verified</option><option value="rejected">Rejected</option><option value="flagged">Flagged or restricted</option></select>
+        <span className="text-xs text-cream-400 whitespace-nowrap">{filtered.length} of {rows.length} accounts</span>
+      </div>
       <div className="space-y-3">
-        {rows.map((row) => (
-          <article key={row.id} className="rounded-xl border border-void-700 p-4">
+        {filtered.map((row) => (
+          <article key={row.id} className="admin-account">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-cream-100 font-medium">{row.name || row.email}</span>
               <Badge color={row.kycStatus === 'approved' ? 'green' : row.kycStatus === 'rejected' ? 'red' : 'yellow'}>{row.kycStatus}</Badge>
@@ -701,7 +722,7 @@ function Accounts({ title, copy, rows, desk, run, busy, kind }: {
             )}
           </article>
         ))}
-        {rows.length === 0 && <p className="text-cream-400 text-sm">No accounts.</p>}
+        {filtered.length === 0 && <div className="admin-empty"><UsersIcon size={28} /><h3>{rows.length ? 'No matching accounts' : 'No accounts yet'}</h3><p>{rows.length ? 'Try another search or status filter.' : 'Registered accounts will appear here.'}</p>{rows.length > 0 && <button className="text-accent text-sm mt-3" onClick={() => { setSearch(''); setStatus('all'); }}>Clear filters</button>}</div>}
       </div>
     </div>
   );
@@ -712,14 +733,14 @@ function titleOf(desk: AdminDesk, id: string) {
 }
 
 function SimpleTable({ headers, rows, empty }: { headers: string[]; rows: string[][]; empty: string }) {
-  if (rows.length === 0) return <p className="text-cream-400 text-sm">{empty}</p>;
+  if (rows.length === 0) return <div className="admin-table-empty"><InboxIcon size={20} /><span>{empty}</span></div>;
   return (
-    <div className="overflow-x-auto rounded-xl border border-void-700">
+    <div className="admin-table-wrap" tabIndex={0} aria-label="Scrollable records" role="region">
       <table className="min-w-full text-sm">
         <thead>
           <tr className="border-b border-void-700">
             {headers.map((header) => (
-              <th key={header} className="px-3 py-2 text-left text-xs font-medium text-cream-400 uppercase">{header}</th>
+              <th scope="col" key={header} className="px-3 py-2 text-left text-xs font-medium text-cream-400 uppercase">{header}</th>
             ))}
           </tr>
         </thead>
