@@ -77,3 +77,15 @@
 @media (max-width: 1279px) { .admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-main { padding: 24px; } }
 @media (max-width: 1023px) { .admin-shell { display: block; } .admin-sidebar { display: none; } }
 @media (max-width: 639px) { .admin-main { padding: 20px 16px 36px; } .admin-console { padding: 18px 14px; } .admin-metrics { gap: 10px; } .admin-metric { padding: 14px; } .admin-metric strong { font-size: 22px; } .admin-page-heading h1 { font-size: 24px; } .admin-property-select select { width: 100%; } .admin-console form { padding: 14px; } .admin-filter-bar select { flex: 1; } }
+.admin-form-title { color: #edf2f7; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.admin-form-copy { color: #939dab; font-size: 12px; line-height: 1.7; margin-bottom: 18px; }
+.admin-detail-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.admin-detail-metrics > div { padding: 16px; border: 1px solid #2b3542; background: #19212b; border-radius: 8px; }
+.admin-detail-metrics span { display: block; color: #9ba5b3; font-size: 11px; margin-bottom: 8px; }
+.admin-detail-metrics strong { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.admin-ledger-note { color: #9ba5b3; background: #0d1218; padding: 12px; border-left: 2px solid #364151; margin-bottom: 20px; font-size: 11px; overflow-wrap: anywhere; }
+.admin-workflow { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 0; margin-bottom: 12px; border-top: 1px solid #28303a; border-bottom: 1px solid #28303a; }
+.admin-workflow button { text-transform: capitalize; font-size: 11px; border-radius: 6px; }
+.admin-workflow button:disabled { opacity: 1; }
+.admin-step-number { display: inline-flex; align-items: center; justify-content: center; height: 18px; width: 18px; border-radius: 50%; background: #ffffff16; margin-right: 4px; font-size: 10px; }
+@media (max-width: 639px) { .admin-detail-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-detail-metrics strong { font-size: 18px; } }

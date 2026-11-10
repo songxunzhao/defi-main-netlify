@@ -88,7 +88,9 @@ export default function Admin() {
       ownerPercent: String(selected.token.ownerPercent ?? 30),
     });
     setFeeBps(String(selected.feeBps || 0));
-  }, [selected?.id]);
+  }, [selected?.id, selected?.title, selected?.location, selected?.description, selected?.valuationUsd, selected?.token.totalSupply, selected?.token.price, selected?.token.ownerPercent, selected?.feeBps]);
+
+  useEffect(() => { setError(''); setNotice(''); }, [section, propertyId]);
 
   const run = async (key: string, payload: Record<string, unknown>, message: string) => {
     if (busy) return;
@@ -410,8 +412,8 @@ function Console(props: {
 }) {
   const { section, desk, selectedId, onSelect, run, busy } = props;
   const property = desk.properties.find((row) => row.id === selectedId) || desk.properties[0];
-  if (section === 'owners') return <Accounts title="Owner management" copy="Onboarding, identity, ownership, wallet, listings, and payouts." rows={desk.owners} desk={desk} run={run} busy={busy} kind="owner" />;
-  if (section === 'investors') return <Accounts title="Investor management" copy="Identity, accreditation, wallets, holdings, cash, and restrictions." rows={desk.investors} desk={desk} run={run} busy={busy} kind="investor" />;
+  if (section === 'owners') return <Accounts key="owners" title="Owner management" copy="Onboarding, identity, ownership, wallet, listings, and payouts." rows={desk.owners} desk={desk} run={run} busy={busy} kind="owner" />;
+  if (section === 'investors') return <Accounts key="investors" title="Investor management" copy="Identity, accreditation, wallets, holdings, cash, and restrictions." rows={desk.investors} desk={desk} run={run} busy={busy} kind="investor" />;
 
   if (!property && ['properties', 'tokens', 'market', 'distributions', 'financials'].includes(section)) return <div className="admin-empty"><Building2Icon size={30} /><h3>No properties available</h3><p>Property submissions will appear here when owners add their listings.</p></div>;
 
@@ -435,10 +437,10 @@ function Console(props: {
           </Badge>
           <span className="text-cream-400 text-sm">{property.ownerName || 'No owner'} · {property.tokensSold}/{property.totalTokens} sold</span>
         </div>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {STAGES.map((stage) => (
-            <Button key={stage} size="sm" variant={property.stage === stage ? 'primary' : 'outline'} disabled={busy === 'stage'} onClick={() => run('stage', { type: 'property-stage', id: property.id, stage }, `Stage set to ${stage}.`)}>
-              {stage}
+        <div className="admin-workflow" aria-label="Property lifecycle">
+          {STAGES.map((stage, index) => (
+            <Button key={stage} size="sm" variant={property.stage === stage ? 'primary' : 'outline'} disabled={Boolean(busy) || property.stage === stage} onClick={() => run('stage', { type: 'property-stage', id: property.id, stage }, `Stage set to ${stage}.`)}>
+              <span className="admin-step-number">{index + 1}</span>{stage}
             </Button>
           ))}
         </div>
@@ -456,12 +458,14 @@ function Console(props: {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); run('value', { type: 'property-valuation', id: property.id, usd: Number(props.valuation) }, 'Valuation saved.'); }}>
+            <h3 className="admin-form-title">Asset valuation</h3><p className="admin-form-copy">Maintain the current assessed value of this property.</p>
             <label className="text-sm text-cream-400">Valuation (USD)
               <input type="number" min="0" step="0.01" required value={props.valuation} onChange={(event) => props.setValuation(event.target.value)} className={fieldClass} />
             </label>
             <Button type="submit" size="sm" disabled={busy === 'value'}>Save valuation</Button>
           </form>
           <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); run('edit', { type: 'property-edit', id: property.id, ...props.edit }, 'Listing updated.'); }}>
+            <h3 className="admin-form-title">Listing details</h3><p className="admin-form-copy">Update the information shown in the property catalog.</p>
             <label className="text-sm text-cream-400">Title
               <input required value={props.edit.title} onChange={(event) => props.setEdit({ ...props.edit, title: event.target.value })} className={fieldClass} />
             </label>
@@ -490,10 +494,10 @@ function Console(props: {
         <h2 className="font-display text-xl font-semibold text-cream-100 mb-1">Tokenization</h2>
         <p className="text-cream-400 text-sm mb-4">Set supply, price, and the owner’s retained percentage. Minting and burning update the catalog supply. Trading pause and transfer limits apply on the market.</p>
         <PropertySelect desk={desk} value={property.id} onChange={onSelect} />
-        <p className="text-cream-300 text-sm mb-4">
-          Supply {property.token.totalSupply} · price ${formatUsd(property.token.price)} · owner {property.token.ownerPercent}% · minted {property.token.minted} · burned {property.token.burned}
-          {property.token.contract ? ` · ${property.token.contract}` : ' · Ledger only; no deployed contract'}
-        </p>
+        <div className="admin-detail-metrics">{[
+          ['Total supply', property.token.totalSupply.toLocaleString()], ['Token price', `$${formatUsd(property.token.price)}`], ['Minted', property.token.minted.toLocaleString()], ['Burned', property.token.burned.toLocaleString()],
+        ].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
+        <p className="admin-ledger-note">{property.token.contract ? `Contract: ${property.token.contract}` : 'Ledger only · No deployed contract'} · Owner retains {property.token.ownerPercent}%</p>
         <form className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4" onSubmit={(event) => { event.preventDefault(); run('token', { type: 'token-set', id: property.id, totalSupply: Number(props.token.supply), price: Number(props.token.price), ownerPercent: Number(props.token.ownerPercent) }, 'Token terms saved.'); }}>
           <label className="text-sm text-cream-400">Total supply
             <input type="number" min="1" step="1" required value={props.token.supply} onChange={(event) => props.setToken({ ...props.token, supply: event.target.value })} className={fieldClass} />
@@ -506,6 +510,7 @@ function Console(props: {
           </label>
           <div className="md:col-span-3"><Button type="submit" size="sm" disabled={busy === 'token'}>Save token</Button></div>
         </form>
+        <h3 className="admin-form-title mt-6">Supply & trading controls</h3><p className="admin-form-copy">Adjust ledger supply and control market access for this property.</p>
         <div className="flex flex-wrap items-end gap-2">
           <label className="text-sm text-cream-400">Shares
             <input type="number" min="1" step="1" required value={props.mintShares} onChange={(event) => props.setMintShares(event.target.value)} className={fieldClass} />
@@ -568,6 +573,9 @@ function Console(props: {
         <p className="text-cream-400 text-sm mb-4">
           Max LTV {pct(desk.lending.maxLtv)} · liquidation {pct(desk.lending.liquidationLtv)} · borrow {pct(desk.lending.borrowApr)} · supply {pct(desk.lending.supplyApr)} · pool ${formatUsd(desk.lending.poolUsdc)}
         </p>
+        <div className="admin-detail-metrics">{[
+          ['Available pool', `$${formatUsd(desk.lending.poolUsdc)}`], ['Active loans', String(loans.length)], ['Outstanding debt', `$${formatUsd(sum(loans.map((loan) => loan.debt)))}`], ['Collateral value', `$${formatUsd(sum(loans.map((loan) => loan.collateral)))}`],
+        ].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
         <SimpleTable
           empty="No open loans."
           headers={['Borrower', 'Debt', 'Interest', 'Collateral', 'LTV', 'Health']}
