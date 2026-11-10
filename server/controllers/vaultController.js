@@ -24,6 +24,8 @@ async function seed(req, res) {
 
 async function propertyFile(req, res) {
   try {
+    // Private data-room files must always pass their own current access checks.
+    if (req.params.propertyId.startsWith('private-room-')) return res.status(404).json({ error: 'Document not found' });
     return sendPdf(res, await vault.readPropertyFile(req.params.propertyId, req.params.file));
   } catch (err) {
     return sendError(res, err);

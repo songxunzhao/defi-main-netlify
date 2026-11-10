@@ -92,6 +92,8 @@ app.use('/api/lend', lendingRoutes);
 app.use('/api/income', require('./routes/income'));
 app.use('/api/investment-plans', require('./routes/investmentPlans'));
 app.use('/api/institutional-quotes', require('./routes/institutionalQuotes'));
+app.use('/api/fundraising', require('./routes/fundraising'));
+app.use('/api/data-rooms', require('./routes/dataRooms'));
 app.use('/api/bridge', bridgeRoutes);
 app.use('/api/admin', adminRoutes);
 

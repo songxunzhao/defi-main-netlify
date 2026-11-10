@@ -13,8 +13,9 @@ import { AddProperty } from './AddProperty';
 import { OwnerFinance } from './OwnerFinance';
 import { OwnerFunding } from './OwnerFunding';
 import { OwnerTokenize } from './OwnerTokenize';
+import { FundraisingDashboard } from './FundraisingDashboard';
 
-const TABS = ['dashboard', 'add', 'funding', 'tokenize', 'financing', 'settings'] as const;
+const TABS = ['dashboard', 'add', 'funding', 'fundraising', 'tokenize', 'financing', 'settings'] as const;
 
 function valuationOf(property: Property) {
   return property.offering?.valuation || property.price || 0;
@@ -174,6 +175,8 @@ export function OwnerDesk() {
             <OwnerFunding properties={owned} onSaved={saved} />
           </section>
         )}
+
+        {tab === 'fundraising' && <FundraisingDashboard />}
 
         {tab === 'tokenize' && (
           <section>

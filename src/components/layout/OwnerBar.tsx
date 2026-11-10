@@ -10,6 +10,7 @@ export const OWNER_LINKS = [
   { id: 'dashboard', label: 'Dashboard', to: '/user' },
   { id: 'add', label: 'Add property', to: '/user?tab=add' },
   { id: 'funding', label: 'Funding', to: '/user?tab=funding' },
+  { id: 'fundraising', label: 'Fundraising', to: '/user?tab=fundraising' },
   { id: 'tokenize', label: 'Tokenize', to: '/user?tab=tokenize' },
   { id: 'financing', label: 'Financing', to: '/user?tab=financing' },
   { id: 'governance', label: 'Govern', to: '/governance' },

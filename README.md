@@ -42,6 +42,14 @@ Lending uses prospective utilization-based APRs: 2% base borrowing APR, 8% at 80
 
 Institutions and operators access private all-or-none block quotes at `/institution` (Admin → Block quotes). A verified institution requests a block, the operator proposes a funded counterparty and terms, that counterparty confirms and reserves assets, and the requester accepts and reserves its side. The operator can then settle within 48 hours. Quote expiry or cancellation releases outstanding reservations. Both participants must remain verified and unrestricted. Settlements conserve ledger cash and shares and create a trade reference and history. This workflow does not submit bank payments or Corda/Solana transactions; the existing bridge records remain separate.
 
+## Owner fundraising dashboard
+
+Owners can open **Fundraising** in the owner navigation (`/user?tab=fundraising`) to see campaign targets, deadlines, and recorded application-ledger funding alongside a private investor pipeline. Add and edit prospects with an amount, contact details, follow-up date, notes, and an interested, signed commitment, or withdrawn stage. Signed commitments require a document reference; references are operator-entered and are not independently verified or electronically signed by this feature.
+
+Interest and signed commitments are separate pipeline stages. They do not move cash, reserve funds, issue shares, or increase campaign funding. Campaign progress comes only from the existing campaign's `raised` field; it may include demo balances and does not establish bank receipt or on-chain settlement. Withdrawn prospects remain in the history and are excluded from active pipeline amounts and due follow-ups. Follow-up dates are reminders in the dashboard; no email or background notification is sent.
+
+Authenticated `/api/fundraising` reads return only an owner's properties and prospects; active admins can access all properties through the API. `POST /api/fundraising/prospects` creates a record and `PATCH /api/fundraising/prospects/:id` updates it with the last read `version`. Duplicate emails within one property are rejected, and each change records an attributed history snapshot. Stale edits return 409; refresh and reopen the record before retrying. Prospect data uses the existing persistence backend and is kept outside public catalog responses.
+
 ## Sample property documents
 
 One reference property, Luxury Downtown Apartment, supplies three shared two-page PDFs: Property Deed, Financial Projections, and Inspection Report. All catalog listings link to this same set, rather than storing copies per property. Download them from the property Documents section or the admin vault. Every page is marked as a fictional sample: deeds are unsigned and unrecorded, projections disclose assumptions, and inspection findings are invented rather than site observations.
